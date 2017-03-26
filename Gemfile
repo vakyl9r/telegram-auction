@@ -33,8 +33,11 @@ gem 'jbuilder', '~> 2.5'
 # gem 'bcrypt', '~> 3.1.7'
 gem 'bootstrap-sass'
 gem 'haml'
+
 gem 'devise'
 gem 'wdm'
+
+gem 'telegram-bot-ruby'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
