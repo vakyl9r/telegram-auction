@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  image: MyString
+  start_price: 1.5
+  bet: 1.5
+  current_price: 1.5
+  participants: MyString
+  history: MyString
+
+two:
+  name: MyString
+  image: MyString
+  start_price: 1.5
+  bet: 1.5
+  current_price: 1.5
+  participants: MyString
+  history: MyString

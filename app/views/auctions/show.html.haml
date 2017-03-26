@@ -1,0 +1,25 @@
+%p#notice= notice
+%p
+  %strong Name:
+  = @auction.name
+%p
+  %strong Image:
+  = @auction.image
+%p
+  %strong Start price:
+  = @auction.start_price
+%p
+  %strong Bet:
+  = @auction.bet
+%p
+  %strong Current price:
+  = @auction.current_price
+%p
+  %strong Participants:
+  = @auction.participants
+%p
+  %strong History:
+  = @auction.history
+= link_to 'Edit', edit_auction_path(@auction)
+|
+\#{link_to 'Back', auctions_path}

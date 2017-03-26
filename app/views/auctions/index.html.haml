@@ -1,0 +1,28 @@
+%p#notice= notice
+%h1 Auctions
+%table
+  %thead
+    %tr
+      %th Name
+      %th Image
+      %th Start price
+      %th Bet
+      %th Current price
+      %th Participants
+      %th History
+      %th{:colspan => "3"}
+  %tbody
+    - @auctions.each do |auction|
+      %tr
+        %td= auction.name
+        %td= auction.image
+        %td= auction.start_price
+        %td= auction.bet
+        %td= auction.current_price
+        %td= auction.participants
+        %td= auction.history
+        %td= link_to 'Show', auction
+        %td= link_to 'Edit', edit_auction_path(auction)
+        %td= link_to 'Destroy', auction, method: :delete, data: { confirm: 'Are you sure?' }
+%br/
+= link_to 'New Auction', new_auction_path

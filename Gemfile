@@ -34,6 +34,7 @@ gem 'jbuilder', '~> 2.5'
 gem 'bootstrap-sass'
 gem 'haml'
 gem 'devise'
+gem 'wdm'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
