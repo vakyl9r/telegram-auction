@@ -7,26 +7,17 @@
       %ul
         - auction.errors.full_messages.each do |message|
           %li= message
-  .field
+  .form-group
     = f.label :name
-    = f.text_field :name
-  .field
+    = f.text_field :name, class: 'form-control'
+  .form-group
     = f.label :image
-    = f.text_field :image
-  .field
+    = f.text_field :image, class: 'form-control'
+  .form-group
     = f.label :start_price
-    = f.text_field :start_price
-  .field
+    = f.text_field :start_price, class: 'form-control'
+  .form-group
     = f.label :bet
-    = f.text_field :bet
-  .field
-    = f.label :current_price
-    = f.text_field :current_price
-  .field
-    = f.label :participants
-    = f.text_field :participants
-  .field
-    = f.label :history
-    = f.text_field :history
+    = f.text_field :bet, class: 'form-control'
   .actions
-    = f.submit
+    = f.submit class: 'btn btn-primary'
