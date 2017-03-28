@@ -8,16 +8,19 @@
         - auction.errors.full_messages.each do |message|
           %li= message
   .form-group
-    = f.label :name
+    = f.label :name, class:'control-label'
     = f.text_field :name, class: 'form-control'
   .form-group
-    = f.label :image
-    = f.text_field :image, class: 'form-control'
+    = f.label :image_1, class:'control-label'
+    = f.file_field :image_1, class: 'form-control'
   .form-group
-    = f.label :start_price
+    = f.label :image_2, class:'control-label'
+    = f.file_field :image_2, class: 'form-control'
+  .form-group
+    = f.label :start_price, class:'control-label'
     = f.text_field :start_price, class: 'form-control'
   .form-group
-    = f.label :bet
+    = f.label :bet, class:'control-label'
     = f.text_field :bet, class: 'form-control'
   .actions
     = f.submit class: 'btn btn-primary'

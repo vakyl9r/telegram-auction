@@ -3,8 +3,11 @@
   %strong Name:
   = @auction.name
 %p
-  %strong Image:
-  = @auction.image
+  %strong Image_1:
+  = image_tag @auction.image_1, class: 'img-thumbnail'
+%p
+  %strong Image_2:
+  = image_tag @auction.image_2, class: 'img-thumbnail'
 %p
   %strong Start price:
   = @auction.start_price

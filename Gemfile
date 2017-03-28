@@ -35,6 +35,7 @@ gem 'bootstrap-sass'
 gem 'haml'
 
 gem 'devise'
+gem 'carrierwave'
 
 # gem 'telegram-bot-ruby'
 gem 'telegram-bot'

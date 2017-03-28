@@ -10,14 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170328095906) do
 
+ActiveRecord::Schema.define(version: 20170328100921) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "auctions", force: :cascade do |t|
     t.string   "name"
-    t.string   "image"
+    t.string   "image_1"
     t.float    "start_price"
     t.float    "bet"
     t.float    "current_price"
@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(version: 20170328095906) do
     t.string   "history"
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
+    t.string   "image_2"
     t.boolean  "active",        default: false
   end
 
