@@ -10,10 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-ActiveRecord::Schema.define(version: 20170328100921) do
+ActiveRecord::Schema.define(version: 20170328130753) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "hstore"
 
   create_table "auctions", force: :cascade do |t|
     t.string   "name"
@@ -21,12 +21,12 @@ ActiveRecord::Schema.define(version: 20170328100921) do
     t.float    "start_price"
     t.float    "bet"
     t.float    "current_price"
-    t.string   "participants"
-    t.string   "history"
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
-    t.string   "image_2"
     t.boolean  "active",        default: false
+    t.string   "image_2"
+    t.hstore   "participants",  default: {},    null: false
+    t.hstore   "history",       default: {},    null: false
   end
 
   create_table "users", force: :cascade do |t|
@@ -45,5 +45,4 @@ ActiveRecord::Schema.define(version: 20170328100921) do
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   end
-
 end
