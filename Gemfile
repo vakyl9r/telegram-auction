@@ -36,7 +36,8 @@ gem 'haml'
 
 gem 'devise'
 
-gem 'telegram-bot-ruby'
+# gem 'telegram-bot-ruby'
+gem 'telegram-bot'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
@@ -44,6 +45,8 @@ gem 'telegram-bot-ruby'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platform: :mri
+  gem 'pry-rails'
+  gem 'pry-nav'
 end
 
 group :development do
