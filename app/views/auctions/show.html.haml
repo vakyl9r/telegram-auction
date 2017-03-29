@@ -61,8 +61,18 @@
               History
         #history.panel-collapse.collapse
           .panel-body
-            - @auction.history.each do |event|
-              %p= event
+            %table.table.table-striped.table-bordered.table-hover
+              %thead
+                %tr.info
+                  %th User ID
+                  %th Name
+                  %th Bet
+              %tbody
+                - @auction.history.each do |event|
+                  %tr
+                    %td= event['user_id']
+                    %td= event['full_name']
+                    %td= event['bet']
     .pull-right
       = link_to 'Start Auction', start_auction_path, class: 'btn btn-primary'
       = link_to 'Stop Auction', stop_auction_path, class: 'btn btn-danger'
