@@ -5,35 +5,36 @@
     = csrf_meta_tags
     = stylesheet_link_tag 'application', media: 'all'
     = javascript_include_tag 'application'
-  %body
-    %nav.navbar.navbar-default
-      .container
-        / Brand and toggle get grouped for better mobile display
-        .navbar-header
-          %button.navbar-toggle.collapsed{"aria-expanded" => "false", "data-target" => "#bs-example-navbar-collapse-1", "data-toggle" => "collapse", :type => "button"}
-            %span.sr-only Toggle navigation
-            %span.icon-bar
-            %span.icon-bar
-            %span.icon-bar
-          %a.navbar-brand{:href => "#"} Skay BU
-        / Collect the nav links, forms, and other content for toggling
-        #bs-example-navbar-collapse-1.collapse.navbar-collapse
-          %ul.nav.navbar-nav
-            %li
-              = link_to 'Lots', root_path
-              %span.sr-only (current)
-            %li= link_to 'Blacklist', banned_users_path
-          %ul.nav.navbar-nav.navbar-right
-            - if current_user
-              %li.dropdown
-                %a.dropdown-toggle{'data-toggle': 'dropdown', href: '#'}
-                  = current_user.email
-                  %b.caret
-                %ul.dropdown-menu
-                  %li= link_to 'Log out', destroy_user_session_path, method: :delete
-            - else
-              %li= link_to 'Log in', new_user_session_path
-              %li= link_to 'Sign up', new_user_registration_path
+    %meta{:content => "width=device-width, initial-scale=1, maximum-scale=1", :name => "viewport"}/
+  %body{ role: "document" }
+    %nav.navbar.navbar-inverse
+      / Brand and toggle get grouped for better mobile display
+      .navbar-header
+        %button.navbar-toggle.collapsed{"aria-expanded" => "false", "data-target" => "#bs-example-navbar-collapse-1", "data-toggle" => "collapse", :type => "button"}
+          %span.sr-only Toggle navigation
+          %span.icon-bar
+          %span.icon-bar
+          %span.icon-bar
+        %a.navbar-brand{:href => "#"} Skay BU
+      / Collect the nav links, forms, and other content for toggling
+      #bs-example-navbar-collapse-1.collapse.navbar-collapse
+        %ul.nav.navbar-nav
+          %li
+            = link_to 'Lots', root_path
+            %span.sr-only (current)
+          %li= link_to 'Blacklist', banned_users_path
+        %ul.nav.navbar-nav.navbar-right
+          - if current_user
+            %li.dropdown
+              %a.dropdown-toggle{'data-toggle': 'dropdown', href: '#'}
+                = current_user.email
+                %b.caret
+              %ul.dropdown-menu
+                %li= link_to 'Log out', destroy_user_session_path, method: :delete
+          - else
+            %li= link_to 'Log in', new_user_session_path
+            %li= link_to 'Sign up', new_user_registration_path
+
     .container
       - if notice
         %p.alert.alert-info= notice
@@ -42,4 +43,5 @@
       - if flash[:error]
         %p.alert.alert-danger= flash[:error]
       .row
-        = yield
+        .col-sm-12
+          = yield
