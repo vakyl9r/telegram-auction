@@ -4,8 +4,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   before_action :set_auction
 
   def start
-    response = from ? "Здравствуйте, #{from['first_name']}!" : 'Здравствуйте!'
-    respond_with :message, text: response
+    respond_with :message, text: "Здравствуйте, #{from['first_name']}!"
     respond_with :message, text: 'Добро пожаловать в комнату аукционов Skay BU'
   end
 
