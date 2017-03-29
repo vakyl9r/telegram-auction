@@ -36,8 +36,20 @@
               Participants
         #participants.panel-collapse.collapse
           .panel-body
-            - @auction.participants.each do |participant|
-              %p= participant
+            %table.table.table-striped.table-bordered.table-hover
+              %thead
+                %tr.info
+                  %th User ID
+                  %th First Name
+                  %th Last Name
+                  %th.thin-column= 'Actions'
+              %tbody
+                - @auction.participants.each do |participant|
+                  %tr
+                    %td= participant['id']
+                    %td= participant['first_name']
+                    %td= participant['last_name']
+                    %td= 'Ban'
       .panel.panel-default
         .panel-heading
           %h4.panel-title
@@ -50,4 +62,3 @@
     .pull-right
       = link_to 'Start Auction', start_auction_path, class: 'btn btn-primary'
       = link_to 'Stop Auction', stop_auction_path, class: 'btn btn-danger'
-
