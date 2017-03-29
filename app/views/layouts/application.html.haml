@@ -3,8 +3,8 @@
   %head
     %title TelegramAuction
     = csrf_meta_tags
-    = stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload'
-    = javascript_include_tag 'application', 'data-turbolinks-track': 'reload'
+    = stylesheet_link_tag 'application', media: 'all'
+    = javascript_include_tag 'application'
   %body
     %nav.navbar.navbar-default.navbar-static-top
       .container
@@ -14,7 +14,7 @@
         - if current_user
           %ul.nav.navbar-nav
             %li= link_to 'Lots', root_path
-            %li= link_to 'Black List'
+            %li= link_to 'Blacklist', banned_users_path
 
         %ul.nav.navbar-nav.navbar-right
           - if current_user

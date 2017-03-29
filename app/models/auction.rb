@@ -19,4 +19,8 @@ class Auction < ApplicationRecord
   def set_price(price)
     update(current_price: price)
   end
+
+  def check(participant_user_id)
+    BannedUser.where(user_id: participant_user_id).empty?
+  end
 end

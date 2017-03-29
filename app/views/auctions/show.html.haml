@@ -46,10 +46,14 @@
               %tbody
                 - @auction.participants.each do |participant|
                   %tr
-                    %td= participant['id']
-                    %td= participant['first_name']
-                    %td= participant['last_name']
-                    %td= 'Ban'
+                    %td.id= participant['id']
+                    %td.first_name= participant['first_name']
+                    %td.last_name= participant['last_name']
+                    %td
+                      - if @auction.check(participant['id'])
+                        %button.btn.btn-danger.ban Ban
+                      - else
+                        ='Banned'
       .panel.panel-default
         .panel-heading
           %h4.panel-title
