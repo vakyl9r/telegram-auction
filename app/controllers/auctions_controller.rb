@@ -73,7 +73,8 @@ class AuctionsController < ApplicationController
 
   def auction_params
     params.require(:auction).permit(
-      :name, :image_1, :image_2, :start_price, :bet_price, :current_price, :participants, :history
+      :name, :image_1, :image_2, :start_price, :bet_price, :current_price,
+      :participants, :history, :description, :end_price, :auction_time
     )
   end
 end
