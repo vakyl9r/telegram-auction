@@ -3,7 +3,9 @@ class Auction < ApplicationRecord
   mount_uploader :image_2, ImageUploader
 
   def add_participant(participant)
-    update(participants: participants << participant) if participants.exclude?(participant)
+    if participants.exclude?(participant.stringify_keys)
+      update(participants: participants << participant)
+    end
   end
 
   def save_in_history(event)

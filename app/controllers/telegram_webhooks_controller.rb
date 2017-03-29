@@ -33,14 +33,14 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def message(message)
-    can_raise?(message) ? raise_price : decline_raise_price if message['reply_to_message']
+    can_raise?(message) ? raise_price(message) : decline_raise_price if message['reply_to_message']
   end
 
   private
 
   def participate
     @auction.add_participant(
-      { id: from['id'], first_name: from['first_name'], last_name: from['last_name'] }
+      { id: from['id'].to_s, first_name: from['first_name'], last_name: from['last_name'] }
     )
     bot.send_message chat_id: from['id'],
       text: "Вы принимаете участие в аукционе по лоту: '#{@auction.name}'\n" \
@@ -50,7 +50,13 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def bet
     @auction.bet
-    @auction.save_in_history({ @auction.current_price => from['id'] })
+    @auction.save_in_history(
+      {
+        user_id: from['id'],
+        full_name: "#{from['first_name']} #{from['last_name']}",
+        bet: @auction.current_price
+      }
+    )
     respond_with :message, text: "#{from['first_name']}, Вы подняли цену до #{@auction.current_price}$"
     remove_buttons
     auction_newsletter
@@ -71,9 +77,13 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     message['text'].to_f > @auction.current_price
   end
 
-  def raise_price
-    @auction.set_price(price)
-    @auction.save_in_history({ @auction.current_price => from['id'] })
+  def raise_price(message)
+    @auction.set_price(message['text'].to_f)
+    @auction.save_in_history({
+      user_id: from['id'],
+      full_name: "#{from['first_name']} #{from['last_name']}",
+      bet: @auction.current_price
+    })
     respond_with :message, text: "#{from['first_name']}, Вы подняли цену до #{@auction.current_price}$"
     auction_newsletter
   end
@@ -90,12 +100,12 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def auction_newsletter
-    last = @auction.history.values.last.to_s
-    @auction.participants.map do |participant_id, participant_name|
-      if participant_id != last
-        bot.send_message chat_id: participant_id,
-        text: "#{participant_name}, Вы принимаете участие в аукционе по лоту:" \
-        "'#{@auction.name}'.\n#{@auction.participants["#{last}"].slice(0,3)}*** " \
+    last = @auction.history.last
+    @auction.participants.map do |participant|
+      if participant['id'] != last['user_id']
+        bot.send_message chat_id: participant['id'],
+        text: "#{participant['first_name']}, Вы принимаете участие в аукционе по лоту:" \
+        "'#{@auction.name}'.\n#{last['full_name'].slice(0,3)}*** " \
         "поднял цену до #{@auction.current_price}$.", reply_markup: keyboard
       end
     end
@@ -112,7 +122,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   def keyboard
     kb = {
       inline_keyboard: [
-        [{text: "Поднять ставку на #{@auction.bet}$", callback_data: 'bet'}],
+        [{text: "Поднять ставку на #{@auction.bet_price}$", callback_data: 'bet'}],
         [{text: 'Указать свою цену', callback_data: 'set_own_price'}],
       ],
     }
