@@ -1,5 +1,5 @@
-# # require 'telegram/bot'
-# # require 'pry'
+# require 'telegram/bot'
+# require 'pry'
 # token = '287792996:AAEkvHSISrFSPXe_ZBEY4b0aPqB_3VKhh5o'
 
 # auction = {

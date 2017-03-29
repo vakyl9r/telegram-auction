@@ -1,28 +1,20 @@
 class AuctionsController < ApplicationController
-  before_action :set_auction, only: [:show, :edit, :update, :destroy]
+  before_action :set_auction, except: [:index, :new, :create]
 
-  # GET /auctions
-  # GET /auctions.json
   def index
     @auctions = Auction.all
   end
 
-  # GET /auctions/1
-  # GET /auctions/1.json
   def show
   end
 
-  # GET /auctions/new
   def new
     @auction = Auction.new
   end
 
-  # GET /auctions/1/edit
   def edit
   end
 
-  # POST /auctions
-  # POST /auctions.json
   def create
     @auction = Auction.new(auction_params)
 
@@ -37,8 +29,6 @@ class AuctionsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /auctions/1
-  # PATCH/PUT /auctions/1.json
   def update
     respond_to do |format|
       if @auction.update(auction_params)
@@ -51,8 +41,6 @@ class AuctionsController < ApplicationController
     end
   end
 
-  # DELETE /auctions/1
-  # DELETE /auctions/1.json
   def destroy
     @auction.destroy
     respond_to do |format|
@@ -61,14 +49,31 @@ class AuctionsController < ApplicationController
     end
   end
 
-  private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_auction
-      @auction = Auction.find(params[:id])
+  def start
+    @auction.update(active: true, current_price: @auction.start_price)
+    respond_to do |format|
+      format.html { redirect_to @auction, notice: 'The auction started!' }
+      format.json { head :no_content }
     end
+  end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def auction_params
-      params.require(:auction).permit(:name, :image_1, :image_2, :start_price, :bet, :current_price, :participants, :history)
+  def stop
+    @auction.update(active: false)
+    respond_to do |format|
+      format.html { redirect_to @auction, notice: 'The auction is over!' }
+      format.json { head :no_content }
     end
+  end
+
+  private
+
+  def set_auction
+    @auction = Auction.find(params[:id])
+  end
+
+  def auction_params
+    params.require(:auction).permit(
+      :name, :image_1, :image_2, :start_price, :bet_price, :current_price, :participants, :history
+    )
+  end
 end

@@ -1,28 +1,53 @@
-%p#notice= notice
-%p
-  %strong Name:
-  = @auction.name
-%p
-  %strong Image_1:
-  = image_tag @auction.image_1, class: 'img-thumbnail'
-%p
-  %strong Image_2:
-  = image_tag @auction.image_2, class: 'img-thumbnail'
-%p
-  %strong Start price:
-  = @auction.start_price
-%p
-  %strong Bet:
-  = @auction.bet
-%p
-  %strong Current price:
-  = @auction.current_price
-%p
-  %strong Participants:
-  = @auction.participants
-%p
-  %strong History:
-  = @auction.history
-= link_to 'Edit', edit_auction_path(@auction)
-|
-\#{link_to 'Back', root_path}
+.row
+  .col-md-12.col-xs-12
+    #accordion.panel-group
+      .panel.panel-default
+        .panel-heading
+          %h4.panel-title
+            %a{'data-parent' => '#accordion', 'data-toggle' => 'collapse', :href => '#lot'}
+              Auction Lot
+        #lot.panel-collapse.collapse.in
+          .panel-body
+            %p
+              %strong Name:
+              = @auction.name
+            %p
+              %strong Image_1:
+              = image_tag @auction.image_1, class: 'img-thumbnail media-object', size: '300x300'
+            %p
+              %strong Image_2:
+              = image_tag @auction.image_2, class: 'img-thumbnail media-object', size: '300x300'
+            %p
+              %strong Start price:
+              = @auction.start_price
+            %p
+              %strong Bet:
+              = @auction.bet_price
+            %p
+              %strong Current price:
+              = @auction.current_price
+
+            = link_to 'Edit', edit_auction_path(@auction), class: 'btn btn-default'
+            / = link_to 'Back', root_path, class: 'btn btn-default'
+      .panel.panel-default
+        .panel-heading
+          %h4.panel-title
+            %a{"data-parent" => "#accordion", "data-toggle" => "collapse", :href => "#participants"}
+              Participants
+        #participants.panel-collapse.collapse
+          .panel-body
+            - @auction.participants.each do |participant|
+              %p= participant
+      .panel.panel-default
+        .panel-heading
+          %h4.panel-title
+            %a{"data-parent" => "#accordion", "data-toggle" => "collapse", :href => "#history"}
+              History
+        #history.panel-collapse.collapse
+          .panel-body
+            - @auction.history.each do |event|
+              %p= event
+    .pull-right
+      = link_to 'Start Auction', start_auction_path, class: 'btn btn-primary'
+      = link_to 'Stop Auction', stop_auction_path, class: 'btn btn-danger'
+

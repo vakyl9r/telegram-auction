@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170328130753) do
+ActiveRecord::Schema.define(version: 20170329082653) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,14 +20,14 @@ ActiveRecord::Schema.define(version: 20170328130753) do
     t.string   "name"
     t.string   "image_1"
     t.float    "start_price"
-    t.float    "bet"
-    t.float    "current_price"
+    t.float    "bet_price"
+    t.float    "current_price", default: 0.0
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
     t.boolean  "active",        default: false
     t.string   "image_2"
-    t.hstore   "participants",  default: {},    null: false
-    t.hstore   "history",       default: {},    null: false
+    t.hstore   "participants",  default: [],    null: false, array: true
+    t.hstore   "history",       default: [],    null: false, array: true
   end
 
   create_table "users", force: :cascade do |t|
