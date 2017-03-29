@@ -13,10 +13,10 @@
               = @auction.name
             %p
               %strong Image_1:
-              = image_tag @auction.image_1, class: 'img-thumbnail media-object', size: '300x300'
+              = image_tag @auction.image_1, class: 'img-thumbnail media-object', size: '250x250'
             %p
               %strong Image_2:
-              = image_tag @auction.image_2, class: 'img-thumbnail media-object', size: '300x300'
+              = image_tag @auction.image_2, class: 'img-thumbnail media-object', size: '250x250'
             %p
               %strong Start price:
               = @auction.start_price
@@ -36,24 +36,25 @@
               Participants
         #participants.panel-collapse.collapse
           .panel-body
-            %table.table.table-striped.table-bordered.table-hover
-              %thead
-                %tr.info
-                  %th User ID
-                  %th First Name
-                  %th Last Name
-                  %th.thin-column= 'Actions'
-              %tbody
-                - @auction.participants.each do |participant|
-                  %tr
-                    %td.id= participant['id']
-                    %td.first_name= participant['first_name']
-                    %td.last_name= participant['last_name']
-                    %td
-                      - if @auction.check(participant['id'])
-                        %button.btn.btn-danger.ban Ban
-                      - else
-                        ='Banned'
+            .table-responsive
+              %table.table.table-striped.table-bordered.table-hover
+                %thead
+                  %tr.info
+                    %th User ID
+                    %th First Name
+                    %th Last Name
+                    %th.thin-column= 'Actions'
+                %tbody
+                  - @auction.participants.each do |participant|
+                    %tr
+                      %td.id= participant['id']
+                      %td.first_name= participant['first_name']
+                      %td.last_name= participant['last_name']
+                      %td
+                        - if @auction.check(participant['id'])
+                          %button.btn.btn-danger.ban Ban
+                        - else
+                          ='Banned'
       .panel.panel-default
         .panel-heading
           %h4.panel-title

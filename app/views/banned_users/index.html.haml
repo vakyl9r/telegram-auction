@@ -1,17 +1,18 @@
 %h1.text-center Blacklist
-%table.table.table-striped.table-bordered.table-hover
-  %thead
-    %tr.info
-      %th User ID
-      %th First Name
-      %th Last Name
-      %th.thin-column= 'Actions'
-  %tbody
-    - @banned_users.each do |banned_user|
-      %tr
-        %td= banned_user.user_id
-        %td= banned_user.first_name
-        %td= banned_user.last_name
-        %td
-          %input#banned_id{ value: banned_user.id, hidden: true }
-          %button.btn.btn-danger.unban Unban
+.table-responsive
+  %table.table.table-striped.table-bordered.table-hover
+    %thead
+      %tr.info
+        %th User ID
+        %th First Name
+        %th Last Name
+        %th.thin-column= 'Actions'
+    %tbody
+      - @banned_users.each do |banned_user|
+        %tr
+          %td= banned_user.user_id
+          %td= banned_user.first_name
+          %td= banned_user.last_name
+          %td
+            %input#banned_id{ value: banned_user.id, hidden: true }
+            %button.btn.btn-danger.unban Unban
