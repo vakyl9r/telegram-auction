@@ -53,7 +53,8 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       {
         user_id: from['id'],
         full_name: "#{from['first_name']} #{from['last_name']}",
-        bet: @auction.current_price
+        bet: @auction.current_price,
+        time: Time.current
       }
     )
     respond_with :message, text: "#{from['first_name']}, Вы подняли цену до #{@auction.current_price}$"

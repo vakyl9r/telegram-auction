@@ -65,6 +65,7 @@
             %ul
               - @auction.history.each do |event|
                 %li
+                  %span= "[#{event['time']}] "
                   %strong= "#{event['full_name']} "
                   поднял ставку на
                   %strong= "#{event['bet']}"
