@@ -1,7 +1,7 @@
 class TelegramWebhooksController < Telegram::Bot::UpdatesController
   include Telegram::Bot::UpdatesController::MessageContext
   context_to_action!
-  before_action :set_auction
+  before_action :set_auction, :verify_blacklist
 
   def start
     respond_with :message, text: "Здравствуйте, #{from['first_name']}!"
@@ -54,7 +54,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
         user_id: from['id'],
         full_name: "#{from['first_name']} #{from['last_name']}",
         bet: @auction.current_price,
-        time: Time.current
+        time: Time.current.strftime('%F %H:%M')
       }
     )
     respond_with :message, text: "#{from['first_name']}, Вы подняли цену до #{@auction.current_price}$"
@@ -116,6 +116,13 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     if @auction.nil?
       respond_with :message, text: 'Auction is over'
       raise 'Auction Over'
+    end
+  end
+
+  def verify_blacklist
+    if BannedUser.find_by(user_id: from['id']).present?
+      respond_with :message, text: 'You are in ban!'
+      raise 'In Blacklist'
     end
   end
 
