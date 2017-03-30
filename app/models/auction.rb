@@ -1,4 +1,6 @@
 class Auction < ApplicationRecord
+  validates :name, :start_price, :bet_price, :current_price,
+    :description, :end_price, :auction_time, presence: true
   mount_uploader :image_1, ImageUploader
   mount_uploader :image_2, ImageUploader
 
