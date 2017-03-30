@@ -4,20 +4,18 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   before_action :set_auction, :verify_blacklist
 
   def start
-    respond_with :message, text: "Здравствуйте, #{from['first_name']}!"
-    respond_with :message, text: 'Добро пожаловать в комнату аукционов Skay BU'
+    respond_with :message, text: "Здравствуйте, #{from['first_name']}!. Вы были успешно " \
+    "зарегистрированы!\n Добро пожаловать в комнату аукционов Skay BU."
   end
 
   def auction
-    send_lot_photos
-    #should replace respond_with with send_message in order to interact with bot only through callback queries
-    respond_with :message, text: "#{@auction.name}\nНачальная цена аукциона: #{@auction.start_price}$",
-    reply_markup:{
-      inline_keyboard: [
-        [{text: 'Участвовать в аукционе!', callback_data: 'participate'}],
-        [{text: 'Зарегистрироваться!', url: 'http://t.me/SkayBU_bot'}],
-      ],
-    }
+    set_admin
+    if $receiver == from['id']
+      send_lot_photos
+      start_message
+    else
+      not_authorized_message
+    end
   end
 
   def callback_query(data)
@@ -28,6 +26,8 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       bet
     when 'set_own_price'
       set_own_price
+    when 'end_auction'
+      end_auction
     end
   end
 
@@ -53,6 +53,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       {
         user_id: from['id'],
         full_name: "#{from['first_name']} #{from['last_name']}",
+        username: from['username'],
         bet: @auction.current_price,
         time: Time.current.strftime('%F %H:%M')
       }
@@ -69,8 +70,12 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def send_lot_photos
     # also should be replaced with send_photo
-    respond_with :photo, photo: File.open(@auction.image_1.path)
-    respond_with :photo, photo: File.open(@auction.image_2.path)
+    if @auction.image_1.present?
+      bot.send_photo chat_id: '@autism_test', photo: File.open(@auction.image_1.path)
+    end
+    if @auction.image_2.present?
+      bot.send_photo chat_id: '@autism_test', photo: File.open(@auction.image_2.path)
+    end
   end
 
   def can_raise?(message)
@@ -82,7 +87,9 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     @auction.save_in_history({
       user_id: from['id'],
       full_name: "#{from['first_name']} #{from['last_name']}",
-      bet: @auction.current_price
+      username: from['username'],
+      bet: @auction.current_price,
+      time: Time.current.strftime('%F %H:%M')
     })
     respond_with :message, text: "#{from['first_name']}, Вы подняли цену до #{@auction.current_price}$"
     auction_newsletter
@@ -109,12 +116,27 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
         "поднял цену до #{@auction.current_price}$.", reply_markup: keyboard
       end
     end
+    if $receiver
+      bot.send_message(chat_id: $receiver, text: "#{last['full_name']} поднял цену по лоту " \
+      "#{@auction.name} до #{@auction.current_price}$.", reply_markup: admin_keyboard)
+    end
+  end
+
+  def end_auction
+    @auction.participants.map do |participant|
+      bot.send_message chat_id: participant['id'],
+      text: "#{participant['first_name']}, аукцион по лоту: '#{@auction.name}' окончен"
+    end
+    send_history
+    @auction.update!(active: false)
+    remove_buttons
+    bot.send_message chat_id: $receiver, text: "Аукцион по лоту #{@auction.name} успешно закрыт"
   end
 
   def set_auction
     @auction = Auction.find_by(active: true)
     if @auction.nil?
-      respond_with :message, text: 'Auction is over'
+      bot.send_message chat_id: from['id'], text: 'Нет активных аукционов'
       raise 'Auction Over'
     end
   end
@@ -133,5 +155,52 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
         [{text: 'Указать свою цену', callback_data: 'set_own_price'}],
       ],
     }
+  end
+
+  def set_admin
+    admins = bot.get_chat_administrators(chat_id: '@autism_test')['result']
+    admins.each do |admin|
+      if admin['user']['id'] == from['id']
+        $receiver = from['id']
+        return $receiver
+      end
+    end
+  end
+
+  def admin_keyboard
+    kb = {
+      inline_keyboard: [
+        [{text: "Закончить аукцион за #{@auction.current_price}$", callback_data: 'end_auction'}],
+      ],
+    }
+  end
+
+  def start_message
+    bot.send_message chat_id: '@autism_test',
+      text: "Название: #{@auction.name}\nОписание: #{@auction.description}\nНачальная цена аукциона: "\
+      "#{@auction.start_price}$\nВНИМАНИЕ! Если Вы в первый раз участвуете в аукционах от Skay BU - нажмите "\
+      "'Зарегистрироваться'. ВНИМАНИЕ!\n"\
+      "После этого, для участия в аукционе по данному лоту нажмите на соответствующую кнопку.",
+      reply_markup:{
+        inline_keyboard: [
+          [{text: 'Участвовать в аукционе', callback_data: 'participate'}],
+          [{text: 'Зарегистрироваться', url: 'http://t.me/SkayBU_bot'}],
+        ],
+      }
+  end
+
+  def send_history
+    @auction.history.last(5).each do |winner|
+      if winner['username']
+        bot.send_message chat_id: $receiver, text: "#{winner['full_name']}, "\
+        "http://t.me/#{winner['username']} - ставка #{winner['bet']}\n"
+      else
+        bot.send_message chat_id: $receiver, text: "#{winner['full_name']} - ставка #{winner['bet']}\n"
+      end
+    end
+  end
+
+  def not_authorized_message
+    bot.send_message chat_id: from['id'], text: 'У вас нет прав для начала аукциона!'
   end
 end

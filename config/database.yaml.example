@@ -13,7 +13,9 @@ default: &default
 development:
   <<: *default
   database: telegram-auction_development
-  user: ivan
+  username: postgres
+  password: postgres
+
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -21,7 +23,9 @@ development:
 test:
   <<: *default
   database: telegram-auction_test
-  user: ivan
+  username: postgres
+  password: postgres
+
 
 production:
   <<: *default
