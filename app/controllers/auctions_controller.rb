@@ -51,7 +51,7 @@ class AuctionsController < ApplicationController
   end
 
   def start
-    @auction.update(active: true, current_price: @auction.start_price)
+    @auction.update!(active: true, current_price: @auction.start_price)
     respond_to do |format|
       format.html { redirect_to @auction, notice: 'The auction started!' }
       format.json { head :no_content }
@@ -59,7 +59,7 @@ class AuctionsController < ApplicationController
   end
 
   def stop
-    @auction.update(active: false)
+    @auction.update!(active: false)
     respond_to do |format|
       format.html { redirect_to @auction, notice: 'The auction is over!' }
       format.json { head :no_content }

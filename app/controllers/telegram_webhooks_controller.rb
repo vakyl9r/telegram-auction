@@ -113,10 +113,10 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def set_auction
     @auction = Auction.find_by(active: true)
-    # if false
-    #   respond_with :message, text: 'Auction is over'
-    #   raise 'Auction Over'
-    # end
+    if @auction.nil?
+      respond_with :message, text: 'Auction is over'
+      raise 'Auction Over'
+    end
   end
 
   def keyboard
