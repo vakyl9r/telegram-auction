@@ -109,11 +109,13 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   def auction_newsletter
     last = @auction.history.last
     @auction.participants.map do |participant|
-      if participant['id'] != last['user_id']
-        bot.send_message chat_id: participant['id'],
-        text: "#{participant['first_name']}, Вы принимаете участие в аукционе по лоту:" \
-        "'#{@auction.name}'.\n#{last['full_name'].slice(0,3)}*** " \
-        "поднял цену до #{@auction.current_price}$.", reply_markup: keyboard
+      unless BannedUser.find_by(user_id: participant['id']).present?
+        if participant['id'] != last['user_id']
+          bot.send_message chat_id: participant['id'],
+          text: "#{participant['first_name']}, Вы принимаете участие в аукционе по лоту:" \
+          "'#{@auction.name}'.\n#{last['full_name'].slice(0,3)}*** " \
+          "поднял цену до #{@auction.current_price}$.", reply_markup: keyboard
+        end
       end
     end
     if $receiver
@@ -143,7 +145,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def verify_blacklist
     if BannedUser.find_by(user_id: from['id']).present?
-      respond_with :message, text: 'You are in ban!'
+      bot.send_message chat_id: from['id'], text: 'Вы были забанены!'
       raise 'In Blacklist'
     end
   end
