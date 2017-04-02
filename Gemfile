@@ -43,6 +43,10 @@ gem 'telegram-bot'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
+# Background processing
+gem 'sidekiq'
+gem 'sinatra', require: false # for 'sidekiq/web'
+
 group :production do
   gem 'rails_12factor'
 end

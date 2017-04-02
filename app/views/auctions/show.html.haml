@@ -29,8 +29,6 @@
             %p
               %strong Active:
               = @auction.active ? 'Yes' : 'NO'
-
-            = link_to 'Edit', edit_auction_path(@auction), class: 'btn btn-default'
             / = link_to 'Back', root_path, class: 'btn btn-default'
       .panel.panel-default
         .panel-heading
@@ -76,5 +74,6 @@
                     %strong= "#{event['bet']}"
     .pull-right
       = link_to 'Back', root_path, class: 'btn btn-default'
-      = link_to 'Start Auction', start_auction_path(@auction), class: 'btn btn-primary'
-      = link_to 'Stop Auction', stop_auction_path(@auction), class: 'btn btn-danger'
+      = link_to 'Edit', edit_auction_path(@auction), class: 'btn btn-primary'
+      / = link_to 'Start Auction', start_auction_path(@auction), class: 'btn btn-primary'
+      / = link_to 'Stop Auction', stop_auction_path(@auction), class: 'btn btn-danger'

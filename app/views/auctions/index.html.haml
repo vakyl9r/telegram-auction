@@ -7,20 +7,24 @@
   %table.table.table-striped.table-bordered.table-hover
     %thead
       %tr.info
+        %th ID
         %th Name
         %th Start price
         %th Bet Price
         %th Current price
+        %th Active
         %th.text-center.thin-column{colspan: 2}= 'Actions'
     %tbody
       - @auctions.each do |auction|
         %tr
+          %td= auction.id
           %td
             %h5
               %strong= link_to auction.name, auction
           %td= auction.start_price
           %td= auction.bet_price
           %td= auction.current_price
+          %th= auction.active ? 'Yes' : 'No'
           %td.text-center
             = link_to 'Edit', edit_auction_path(auction), class: 'btn btn-default'
           %td.text-center

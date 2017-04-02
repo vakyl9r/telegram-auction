@@ -1,18 +1,24 @@
 class TelegramWebhooksController < Telegram::Bot::UpdatesController
   include Telegram::Bot::UpdatesController::MessageContext
   context_to_action!
-  before_action :set_auction, :verify_blacklist
+  before_action :set_auction, except: :auction
+  before_action :verify_blacklist
 
   def start
     respond_with :message, text: "Здравствуйте, #{from['first_name']}!. Вы были успешно " \
     "зарегистрированы!\n Добро пожаловать в комнату аукционов Skay BU."
   end
 
-  def auction
+  def auction(auction_id)
+    start_auction(auction_id)
     set_admin
     if $receiver == from['id']
       send_lot_photos
       start_message
+      bot.send_message(
+        chat_id: $receiver, text: "Аукцион по лоту #{@auction.name}",
+        reply_markup: admin_keyboard
+      )
     else
       not_authorized_message
     end
@@ -69,7 +75,6 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def send_lot_photos
-    # also should be replaced with send_photo
     if @auction.image_1.present?
       bot.send_photo chat_id: '@autism_test', photo: File.open(@auction.image_1.path)
     end
@@ -127,19 +132,26 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   def end_auction
     @auction.participants.map do |participant|
       bot.send_message chat_id: participant['id'],
-      text: "#{participant['first_name']}, аукцион по лоту: '#{@auction.name}' окончен"
+        text: "Аукцион по лоту: '#{@auction.name}' будет окончен через 5 минут."
     end
-    send_history
-    @auction.update!(active: false)
-    remove_buttons
-    bot.send_message chat_id: $receiver, text: "Аукцион по лоту #{@auction.name} успешно закрыт"
+    StopAuctionJob.set(wait: 5.minutes).perform_later(@auction, chat['id'], $receiver, update)
   end
 
   def set_auction
     @auction = Auction.find_by(active: true)
     if @auction.nil?
       bot.send_message chat_id: from['id'], text: 'Нет активных аукционов'
-      raise 'Auction Over'
+      render plain: 'ok', status: 200
+      # raise 'Auction Over'
+    end
+  end
+
+  def start_auction(id)
+    @auction = Auction.find(id)
+    if Auction.find_by(active: true).present?
+      bot.send_message chat_id: from['id'], text: 'Уже есть активный аукцион!'
+    else
+      @auction.update(active: true)
     end
   end
 
@@ -180,9 +192,9 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   def start_message
     bot.send_message chat_id: '@autism_test',
       text: "Название: #{@auction.name}\nОписание: #{@auction.description}\nНачальная цена аукциона: "\
-      "#{@auction.start_price}$\nВНИМАНИЕ! Если Вы в первый раз участвуете в аукционах от Skay BU - нажмите "\
-      "'Зарегистрироваться'. ВНИМАНИЕ!\n"\
-      "После этого, для участия в аукционе по данному лоту нажмите на соответствующую кнопку.",
+      "#{@auction.start_price}$\nВНИМАНИЕ! Если Вы в первый раз участвуете в аукционах от Skay BU - "\
+      "нажмите 'Зарегистрироваться'.\n После этого, для участия в аукционе по данному лоту нажмите " \
+      "на соответствующую кнопку.",
       reply_markup:{
         inline_keyboard: [
           [{text: 'Участвовать в аукционе', callback_data: 'participate'}],

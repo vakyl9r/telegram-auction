@@ -8,4 +8,10 @@ Rails.application.routes.draw do
     get :start, on: :member
     get :stop, on: :member
   end
+
+  require 'sidekiq/web'
+  Sidekiq::Web.set :session_secret, Rails.application.secrets[:secret_key_base]
+  authenticate :user do
+    mount Sidekiq::Web => '/sidekiq'
+  end
 end
