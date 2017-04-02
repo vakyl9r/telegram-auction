@@ -1,5 +1,7 @@
 class TelegramWebhooksController < Telegram::Bot::UpdatesController
   include Telegram::Bot::UpdatesController::MessageContext
+  include AbstractController::Rendering
+
   context_to_action!
   before_action :set_auction, except: :auction
   before_action :verify_blacklist
@@ -142,7 +144,6 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     if @auction.nil?
       bot.send_message chat_id: from['id'], text: 'Нет активных аукционов'
       render plain: 'ok', status: 200
-      # raise 'Auction Over'
     end
   end
 
@@ -158,7 +159,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   def verify_blacklist
     if BannedUser.find_by(user_id: from['id']).present?
       bot.send_message chat_id: from['id'], text: 'Вы были забанены!'
-      raise 'In Blacklist'
+      render plain: 'ok', status: 200
     end
   end
 
