@@ -27,6 +27,9 @@ Rails.application.configure do
 
   # `config.assets.precompile` and `config.assets.version` have moved to config/initializers/assets.rb
 
+  # Set application domain, to be able to run `rake telegram:bot:set_webhook`
+  # Rails.application.routes.default_url_options[:host] = 'cherry-shortcake-48414.herokuapp.com'
+
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.action_controller.asset_host = 'http://assets.example.com'
 

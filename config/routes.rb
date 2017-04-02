@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  telegram_webhooks TelegramWebhooksController
+  telegram_webhooks TelegramWebhooksController, as: :mywebhook
   root to: 'auctions#index'
 
   devise_for :users

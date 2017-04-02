@@ -43,21 +43,22 @@
               %table.table.table-striped.table-bordered.table-hover
                 %thead
                   %tr.info
-                    %th User ID
+                    %th User  ID
                     %th First Name
                     %th Last Name
                     %th.thin-column= 'Actions'
                 %tbody
-                  - @auction.participants.each do |participant|
-                    %tr
-                      %td.id= participant['id']
-                      %td.first_name= participant['first_name']
-                      %td.last_name= participant['last_name']
-                      %td
-                        - if @auction.check(participant['id'])
-                          %button.btn.btn-danger.ban Ban
-                        - else
-                          ='Banned'
+                  - if @auction.participants
+                    - @auction.participants.each do |participant|
+                      %tr
+                        %td.id= participant['id']
+                        %td.first_name= participant['first_name']
+                        %td.last_name= participant['last_name']
+                        %td
+                          - if @auction.check(participant['id'])
+                            %button.btn.btn-danger.ban Ban
+                          - else
+                            ='Banned'
       .panel.panel-default
         .panel-heading
           %h4.panel-title
@@ -66,12 +67,13 @@
         #history.panel-collapse.collapse
           .panel-body
             %ul
-              - @auction.history.each do |event|
-                %li
-                  %span= "[#{event['time']}] "
-                  %strong= "#{event['full_name']} "
-                  поднял ставку на
-                  %strong= "#{event['bet']}"
+              -if @auction.history
+                - @auction.history.each do |event|
+                  %li
+                    %span= "[#{event['time']}] "
+                    %strong= "#{event['full_name']} "
+                    поднял ставку на
+                    %strong= "#{event['bet']}"
     .pull-right
       = link_to 'Back', root_path, class: 'btn btn-default'
       = link_to 'Start Auction', start_auction_path(@auction), class: 'btn btn-primary'
