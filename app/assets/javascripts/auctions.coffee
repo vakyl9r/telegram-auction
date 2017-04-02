@@ -3,7 +3,7 @@ $ ->
     if i < 10
       i = '0' + i
     i
-  $('#time').on 'change', ->
+  $('#time').on 'input', ->
     totalMin = $(this).val()
     totalmSec = totalMin * 60000
     hours = Math.floor( totalMin / 60)
@@ -18,4 +18,3 @@ $ ->
     endYear = endDate.getYear() + 1900
     $('#time_p').show()
     $('#time_p')[0].innerHTML = "#{hours} hour(s) #{minutes} minute(s). Auction will end at #{addZero(endDay)}/#{addZero(endMonth)}/#{endYear} #{addZero(endHours)}:#{addZero(endMinutes)}"
-    debugger

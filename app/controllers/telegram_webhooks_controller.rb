@@ -78,10 +78,10 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def send_lot_photos
     if @auction.image_1.present?
-      bot.send_photo chat_id: '@autism_test', photo: File.open(@auction.image_1.path)
+      bot.send_photo chat_id: '@skaybu_test', photo: File.open(@auction.image_1.path)
     end
     if @auction.image_2.present?
-      bot.send_photo chat_id: '@autism_test', photo: File.open(@auction.image_2.path)
+      bot.send_photo chat_id: '@skaybu_test', photo: File.open(@auction.image_2.path)
     end
   end
 
@@ -173,7 +173,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def set_admin
-    admins = bot.get_chat_administrators(chat_id: '@autism_test')['result']
+    admins = bot.get_chat_administrators(chat_id: '@skaybu_test')['result']
     admins.each do |admin|
       if admin['user']['id'] == from['id']
         $receiver = from['id']
@@ -191,7 +191,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def start_message
-    bot.send_message chat_id: '@autism_test',
+    bot.send_message chat_id: '@skaybu_test',
       text: "Название: #{@auction.name}\nОписание: #{@auction.description}\nНачальная цена аукциона: "\
       "#{@auction.start_price}$\nВНИМАНИЕ! Если Вы в первый раз участвуете в аукционах от Skay BU - "\
       "нажмите 'Зарегистрироваться'.\n После этого, для участия в аукционе по данному лоту нажмите " \
