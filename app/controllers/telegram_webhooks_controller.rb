@@ -150,7 +150,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   def start_auction(id)
     @auction = Auction.find(id)
     if Auction.find_by(active: true).present?
-      bot.send_message chat_id: from['id'], text: 'Уже есть активный аукцион!'
+      bot.send_message chat_id: from['id'], text: 'Уже есть 1 активный аукцион!'
       answer_callback_query text: 'Сходи пробздись', show_alert: true
     else
       @auction.update(active: true, current_price: @auction.start_price)
