@@ -159,7 +159,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   def verify_blacklist
     if BannedUser.find_by(user_id: from['id']).present?
       bot.send_message chat_id: from['id'], text: 'Вы были забанены!'
-      raise 'In Blacklist'
+      render plain: 'ok', status: 200
     end
   end
 
