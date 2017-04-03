@@ -10,6 +10,7 @@ class StopAuctionJob < ApplicationJob
     auction.update!(active: false)
     remove_buttons(chat_id, update)
     Telegram.bot.send_message chat_id: auction.receiver, text: "Аукцион по лоту #{auction.name} успешно закрыт"
+    delete_all_workers
   end
 
   private
@@ -28,5 +29,12 @@ class StopAuctionJob < ApplicationJob
   def remove_buttons(chat_id, update)
     Telegram.bot.edit_message_reply_markup(chat_id: chat_id,
       message_id: update['callback_query']['message']['message_id'])
+  end
+
+  def delete_all_workers
+    queue = Sidekiq::Queue.new('default')
+    queue.each do |job|
+      job.delete
+    end
   end
 end
