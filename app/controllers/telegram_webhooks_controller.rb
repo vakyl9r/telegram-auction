@@ -155,6 +155,9 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       bot.send_message chat_id: from['id'], text: 'Уже есть активный аукцион!'
       return false
     else
+      StopAuctionJob.set(wait: @auction.auction_time.minutes).perform_later(
+        @auction, chat['id'], update
+      )
       @auction.update!(active: true, current_price: @auction.start_price)
     end
   end
