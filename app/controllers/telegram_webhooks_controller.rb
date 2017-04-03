@@ -5,7 +5,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   before_action :set_auction, except: :auction
   #define_callbacks :auction, terminator: "result == false"
   before_action :verify_blacklist
-  after_action  :end_price_check, only: [:raise_price, :bet]
+  # after_action :end_price_check, only: [:raise_price, :bet]
 
   def start
     respond_with :message, text: "Здравствуйте, #{from['first_name']}!. Вы были успешно " \
@@ -72,6 +72,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     respond_with :message, text: "#{from['first_name']}, Вы подняли цену до #{@auction.current_price}$"
     remove_buttons
     auction_newsletter
+    end_price_check
   end
 
   def set_own_price
@@ -103,6 +104,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     })
     respond_with :message, text: "#{from['first_name']}, Вы подняли цену до #{@auction.current_price}$"
     auction_newsletter
+    end_price_check
   end
 
   def decline_raise_price
@@ -230,5 +232,4 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       end_auction
     end
   end
-
 end
