@@ -181,13 +181,11 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def set_admin
     admins = bot.get_chat_administrators(chat_id: '@skaybu_test')['result']
-    admins.each do |admin|
+    admins.any? do |admin|
       if admin['user']['id'] == from['id']
         @auction.update!(receiver: from['id'])
-        return
       end
     end
-    @auction.receiver.present? ? true : false
   end
 
   def admin_keyboard
