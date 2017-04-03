@@ -187,7 +187,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
         return
       end
     end
-    @auction.receiver.presense? ? true : false
+    @auction.receiver.present? ? true : false
   end
 
   def admin_keyboard
