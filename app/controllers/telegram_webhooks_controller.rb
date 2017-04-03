@@ -14,16 +14,17 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def auction(auction_id)
     if start_auction(auction_id)
-      set_admin
-      if @auction.receiver == from['id']
-        send_lot_photos
-        start_message
-        bot.send_message(
-          chat_id: @auction.receiver, text: "Аукцион по лоту #{@auction.name}",
-          reply_markup: admin_keyboard
-        )
-      else
-        not_authorized_message
+      if set_admin
+        if @auction.receiver == from['id']
+          send_lot_photos
+          start_message
+          bot.send_message(
+            chat_id: @auction.receiver, text: "Аукцион по лоту #{@auction.name}",
+            reply_markup: admin_keyboard
+          )
+        else
+          not_authorized_message
+        end
       end
     end
   end
@@ -186,6 +187,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
         return
       end
     end
+    @auction.receiver.presense? ? true : false
   end
 
   def admin_keyboard
