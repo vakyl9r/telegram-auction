@@ -51,7 +51,7 @@ class AuctionsController < ApplicationController
   end
 
   def start
-    # StartAuctionJob.perform_now(@auction, Telegram.bot)
+    # StopAuctionJob.set(wait: @auction.auction_time.minutes).perform_later(@auction, 11, {})
     @auction.update(active: true)
     respond_to do |format|
       format.html { redirect_to @auction, notice: 'The auction started!' }
@@ -61,7 +61,7 @@ class AuctionsController < ApplicationController
 
   def stop
     @auction.update(active: false)
-    # StopAuctionJob.perform_now(@auction, Telegram.bot)
+    # StopAuctionJob.perform_now(@auction, 11, {})
     respond_to do |format|
       format.html { redirect_to @auction, notice: 'The auction is over!' }
       format.json { head :no_content }

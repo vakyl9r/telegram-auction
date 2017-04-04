@@ -2,9 +2,10 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   include Telegram::Bot::UpdatesController::MessageContext
   include AbstractController::Rendering
 
-  context_to_action!
   before_action :set_auction, except: :auction
+  #define_callbacks :auction, terminator: "result == false"
   before_action :verify_blacklist
+  # after_action :end_price_check, only: [:raise_price, :bet]
 
   def start
     respond_with :message, text: "Здравствуйте, #{from['first_name']}!. Вы были успешно " \
@@ -12,17 +13,19 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def auction(auction_id)
-    start_auction(auction_id)
-    set_admin
-    if $receiver == from['id']
-      send_lot_photos
-      start_message
-      bot.send_message(
-        chat_id: $receiver, text: "Аукцион по лоту #{@auction.name}",
-        reply_markup: admin_keyboard
-      )
-    else
-      not_authorized_message
+    if start_auction(auction_id)
+      if set_admin
+        if @auction.receiver == from['id']
+          send_lot_photos
+          start_message
+          bot.send_message(
+            chat_id: @auction.receiver, text: "Аукцион по лоту #{@auction.name}",
+            reply_markup: admin_keyboard
+          )
+        else
+          not_authorized_message
+        end
+      end
     end
   end
 
@@ -69,6 +72,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     respond_with :message, text: "#{from['first_name']}, Вы подняли цену до #{@auction.current_price}$"
     remove_buttons
     auction_newsletter
+    end_price_check
   end
 
   def set_own_price
@@ -100,6 +104,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     })
     respond_with :message, text: "#{from['first_name']}, Вы подняли цену до #{@auction.current_price}$"
     auction_newsletter
+    end_price_check
   end
 
   def decline_raise_price
@@ -125,8 +130,8 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
         end
       end
     end
-    if $receiver
-      bot.send_message(chat_id: $receiver, text: "#{last['full_name']} поднял цену по лоту " \
+    if @auction.receiver
+      bot.send_message(chat_id: @auction.receiver, text: "#{last['full_name']} поднял цену по лоту " \
       "#{@auction.name} до #{@auction.current_price}$.", reply_markup: admin_keyboard)
     end
   end
@@ -136,14 +141,14 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       bot.send_message chat_id: participant['id'],
         text: "Аукцион по лоту: '#{@auction.name}' будет окончен через 5 минут."
     end
-    StopAuctionJob.set(wait: 5.minutes).perform_later(@auction, chat['id'], $receiver, update)
+    StopAuctionJob.set(wait: 5.minutes).perform_later(@auction, chat['id'], update)
   end
 
   def set_auction
     @auction = Auction.find_by(active: true)
     if @auction.nil?
       bot.send_message chat_id: from['id'], text: 'Нет активных аукционов'
-      answer_callback_query text: 'Сходи пробздись', show_alert: true
+      throw :abort
     end
   end
 
@@ -151,16 +156,19 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     @auction = Auction.find(id)
     if Auction.find_by(active: true).present?
       bot.send_message chat_id: from['id'], text: 'Уже есть активный аукцион!'
-      answer_callback_query text: 'Сходи пробздись', show_alert: true
+      return false
     else
-      @auction.update(active: true, current_price: @auction.start_price)
+      StopAuctionJob.set(wait: @auction.auction_time.minutes).perform_later(
+        @auction, chat['id'], update
+      )
+      @auction.update!(active: true, current_price: @auction.start_price)
     end
   end
 
   def verify_blacklist
     if BannedUser.find_by(user_id: from['id']).present?
       bot.send_message chat_id: from['id'], text: 'Вы были забанены!'
-      render plain: 'ok', status: 200
+      throw :abort
     end
   end
 
@@ -175,10 +183,9 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def set_admin
     admins = bot.get_chat_administrators(chat_id: '@skaybu_test')['result']
-    admins.each do |admin|
+    admins.any? do |admin|
       if admin['user']['id'] == from['id']
-        $receiver = from['id']
-        return $receiver
+        @auction.update!(receiver: from['id'])
       end
     end
   end
@@ -208,15 +215,21 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   def send_history
     @auction.history.last(5).each do |winner|
       if winner['username']
-        bot.send_message chat_id: $receiver, text: "#{winner['full_name']}, "\
+        bot.send_message chat_id: @auction.receiver, text: "#{winner['full_name']}, "\
         "http://t.me/#{winner['username']} - ставка #{winner['bet']}\n"
       else
-        bot.send_message chat_id: $receiver, text: "#{winner['full_name']} - ставка #{winner['bet']}\n"
+        bot.send_message chat_id: @auction.receiver, text: "#{winner['full_name']} - ставка #{winner['bet']}\n"
       end
     end
   end
 
   def not_authorized_message
     bot.send_message chat_id: from['id'], text: 'У вас нет прав для начала аукциона!'
+  end
+
+  def end_price_check
+    if @auction.current_price >= @auction.end_price
+      end_auction
+    end
   end
 end
