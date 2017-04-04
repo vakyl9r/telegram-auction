@@ -14,6 +14,7 @@ module TelegramAuction
     config.active_job.queue_adapter = :sidekiq
   end
   Sidekiq.default_worker_options = {
-    unique: :until_executing
+    unique: :until_executing,
+    unique_args: ->(args) { [ args.first.except('job_id') ] }
   }
 end
