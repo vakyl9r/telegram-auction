@@ -2,6 +2,7 @@ class StopAuctionJob < ApplicationJob
   queue_as :default
 
   def perform(auction, chat_id, update)
+    destroy_sidekiq_jobs
     auction.participants.map do |participant|
       Telegram.bot.send_message chat_id: participant['id'],
       text: "#{participant['first_name']}, аукцион по лоту: '#{auction.name}' окончен"
@@ -10,7 +11,6 @@ class StopAuctionJob < ApplicationJob
     auction.update!(active: false)
     remove_buttons(chat_id, update)
     Telegram.bot.send_message chat_id: auction.receiver, text: "Аукцион по лоту #{auction.name} успешно закрыт"
-    destroy_sidekiq_jobs
   end
 
   private
