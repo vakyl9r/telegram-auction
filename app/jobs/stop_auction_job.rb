@@ -1,5 +1,4 @@
 class StopAuctionJob < ApplicationJob
-  sidekiq_options unique: :until_executed
   queue_as :default
 
   def perform(auction, chat_id, update)

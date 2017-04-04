@@ -13,4 +13,7 @@ module TelegramAuction
     # -- all .rb files in that directory are automatically loaded.
     config.active_job.queue_adapter = :sidekiq
   end
+  Sidekiq.default_worker_options = {
+    unique: :until_executing
+  }
 end
