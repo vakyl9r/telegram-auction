@@ -45,6 +45,7 @@ gem 'telegram-bot'
 
 # Background processing
 gem 'sidekiq'
+gem 'sidekiq-unique-jobs'
 gem 'sinatra', require: false # for 'sidekiq/web'
 
 group :production do
