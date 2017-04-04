@@ -27,8 +27,10 @@ class StopAuctionJob < ApplicationJob
   end
 
   def remove_buttons(chat_id, update)
-    Telegram.bot.edit_message_reply_markup(chat_id: chat_id,
-      message_id: update['callback_query']['message']['message_id'])
+    if update['callback_query'].present?
+      Telegram.bot.edit_message_reply_markup(chat_id: chat_id,
+        message_id: update['callback_query']['message']['message_id'])
+    end
   end
 
   def destroy_sidekiq_jobs
