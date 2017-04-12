@@ -224,10 +224,12 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def start_message
     bot.send_message chat_id: '@skaybu_test',
-      text: "Название: #{@auction.name}\nОписание: #{@auction.description}\nНачальная цена аукциона: "\
-      "#{@auction.start_price}$\nВНИМАНИЕ! Если Вы в первый раз участвуете в аукционах от Skay BU - "\
-      "нажмите 'Зарегистрироваться'.\n После этого, для участия в аукционе по данному лоту нажмите " \
-      "на соответствующую кнопку.",
+      text: "<b>#{@auction.name}</b>\n<b>Описание лота</b>: #{@auction.description}\n"\
+      "<b>Стартовая цена<b>:#{@auction.start_price}$ \n"\
+      "<b>!ВНИМАНИЕ!<b> Если Вы в первый раз участвуете в #аукционах в этом канале - "\
+      "нажмите <b>'Зарегистрироваться'<b>.\n После этого, для участия"\
+      "нажимайте: <b>'Участвовать в аукционе'<b>",
+      parse_mode: 'HTML',
       reply_markup:{
         inline_keyboard: [
           [{text: 'Участвовать в аукционе', callback_data: 'participate'}],
