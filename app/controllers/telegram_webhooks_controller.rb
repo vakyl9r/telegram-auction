@@ -9,7 +9,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   # after_action :end_price_check, only: [:raise_price, :bet]
 
   def start
-    respond_with :message, text: "Здравствуйте, #{from['first_name']}!. Вы были успешно " \
+    respond_with :message, text: "Здравствуйте, #{from['first_name']}! Вы были успешно " \
     "зарегистрированы!\n Добро пожаловать в комнату аукционов Skay BU."
   end
 
@@ -28,6 +28,23 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
         end
       end
     end
+  end
+
+  def rules
+    respond_with :message, text: "<b>Правила канала</b> <a href='https://t.me/auctionua'>AuctionUA</a> \n" \
+    "1. Делая ставку на товар, участник подтверждает желание и возможность его купить. \n" \
+    "2. В случае отказа покупать выигранный лот, администратор блокирует участника. \n" \
+    "3. Для возврата права на участия в торгах, необходимо связаться с администратором канала <a href='https://t.me/auctionua'>AuctionUA</a>. \n" \
+    "4. Связь с администратором канала <a href='https://t.me/auctionua'>AuctionUA</a>. \n" \
+    "5. На канале <a href='https://t.me/auctionua'>AuctionUA</a> публикуется исключительно техника с гарантией. \n", parse_mode: 'HTML'
+  end
+
+  def sold
+    final_message('<b>Лот продан. Следите за анонсами новых торгов в канале.</b>')
+  end
+
+  def declined
+    final_message('<b>Лот не продан. Будут новые торги по данному лоту, следите за анонсами в канале.</b>')
   end
 
   def callback_query(data)
@@ -232,6 +249,16 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def not_authorized_message
     bot.send_message chat_id: from['id'], text: 'У вас нет прав для начала аукциона!'
+  end
+
+  def final_message(text)
+    admins = bot.get_chat_administrators(chat_id: '@skaybu_test')['result']
+    admins.any? do |admin|
+      if admin['user']['id'] == from['id']
+        bot.send_message chat_id: '@skaybu_test', text: text,
+          parse_mode: 'HTML', reply_markup: {reply_keyboard_remove: [remove_keyboard: true]}
+      end
+    end
   end
 
   def end_price_check
