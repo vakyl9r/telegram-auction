@@ -3,6 +3,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   include AbstractController::Rendering
 
   before_action :set_auction, except: :auction
+  before_action :participant_check, only: :callback_query
   #define_callbacks :auction, terminator: "result == false"
   before_action :verify_blacklist
   # after_action :end_price_check, only: [:raise_price, :bet]
@@ -236,6 +237,13 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   def end_price_check
     if @auction.current_price >= @auction.end_price
       end_auction
+    end
+  end
+
+  def participant_check
+    if @auction.history.last['user_id'] == from['id']
+      bot.send_message chat_id: from['id'], text: 'Ваша ставка последняя. Вы не можете повышать ставку.'
+      throw :abort 
     end
   end
 end
