@@ -36,6 +36,7 @@ gem 'haml'
 
 gem 'devise'
 gem 'carrierwave'
+gem 'file_validators'
 
 # gem 'telegram-bot-ruby'
 gem 'telegram-bot'
