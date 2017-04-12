@@ -6,7 +6,8 @@ class StopAuctionJob < ApplicationJob
       auction.update!(active: false)
       auction.participants.map do |participant|
         Telegram.bot.send_message chat_id: participant['id'],
-        text: "#{participant['first_name']}, аукцион по лоту: '#{auction.name}' окончен"
+        text: "#{participant['first_name']}, аукцион по лоту: '#{auction.name}' окончен"\
+        "Мы связываемся с последним претендентом на лот для подтверждения покупки."
       end
       send_history(auction)
       remove_buttons(chat_id, update)
@@ -26,6 +27,15 @@ class StopAuctionJob < ApplicationJob
         Telegram.bot.send_message chat_id: auction.receiver, text: "#{winner['full_name']} - ставка #{winner['bet']}\n"
       end
     end
+    Telegram.bot.send_message chat_id: auction.receiver, text: "<b>Решите судьбу лота!</b> \n" \
+      "/sold - лот продан, /declined - отказ от продажи.", parse_mode: 'HTML',
+      reply_markup: {reply_keyboard_markup:
+        [
+          keyboard:[
+            %w(/sold), %w(/declined)
+          ], one_time_keyboard: true
+        ]
+      }
   end
 
   def remove_buttons(chat_id, update)

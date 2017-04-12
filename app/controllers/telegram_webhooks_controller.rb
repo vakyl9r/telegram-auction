@@ -3,12 +3,13 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   include AbstractController::Rendering
 
   before_action :set_auction, except: :auction
+  before_action :participant_check, only: :callback_query
   #define_callbacks :auction, terminator: "result == false"
   before_action :verify_blacklist
   # after_action :end_price_check, only: [:raise_price, :bet]
 
   def start
-    respond_with :message, text: "Здравствуйте, #{from['first_name']}!. Вы были успешно " \
+    respond_with :message, text: "Здравствуйте, #{from['first_name']}! Вы были успешно " \
     "зарегистрированы!\n Добро пожаловать в комнату аукционов Skay BU."
   end
 
@@ -27,6 +28,23 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
         end
       end
     end
+  end
+
+  def rules
+    respond_with :message, text: "<b>Правила канала</b> <a href='https://t.me/auctionua'>AuctionUA</a> \n" \
+    "1. Делая ставку на товар, участник подтверждает желание и возможность его купить. \n" \
+    "2. В случае отказа покупать выигранный лот, администратор блокирует участника. \n" \
+    "3. Для возврата права на участия в торгах, необходимо связаться с администратором канала <a href='https://t.me/auctionua'>AuctionUA</a>. \n" \
+    "4. Связь с администратором канала <a href='https://t.me/auctionua'>AuctionUA</a>. \n" \
+    "5. На канале <a href='https://t.me/auctionua'>AuctionUA</a> публикуется исключительно техника с гарантией. \n", parse_mode: 'HTML'
+  end
+
+  def sold
+    final_message('<b>Лот продан. Следите за анонсами новых торгов в канале.</b>')
+  end
+
+  def declined
+    final_message('<b>Лот не продан. Будут новые торги по данному лоту, следите за анонсами в канале.</b>')
   end
 
   def callback_query(data)
@@ -138,9 +156,13 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def end_auction
     if Sidekiq::ScheduledSet.new.size < 2
+      if @auction.current_price >= @auction.end_price
+        text = "Достигнут верхний предел цены по лоту '#{@auction.name}', до окончания аукциона осталось 5 минут."
+      else
+        text = "Аукцион по лоту: '#{@auction.name}' будет окончен через 5 минут."
+      end
       @auction.participants.map do |participant|
-        bot.send_message chat_id: participant['id'],
-          text: "Аукцион по лоту: '#{@auction.name}' будет окончен через 5 минут."
+        bot.send_message chat_id: participant['id'], text: text
       end
       StopAuctionJob.set(wait: 5.minutes).perform_later(@auction, chat['id'], update)
     end
@@ -202,10 +224,12 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def start_message
     bot.send_message chat_id: '@skaybu_test',
-      text: "Название: #{@auction.name}\nОписание: #{@auction.description}\nНачальная цена аукциона: "\
-      "#{@auction.start_price}$\nВНИМАНИЕ! Если Вы в первый раз участвуете в аукционах от Skay BU - "\
-      "нажмите 'Зарегистрироваться'.\n После этого, для участия в аукционе по данному лоту нажмите " \
-      "на соответствующую кнопку.",
+      text: "<b>#{@auction.name}</b>\n<b>Описание лота</b>: #{@auction.description}\n"\
+      "<b>Стартовая цена<b>:#{@auction.start_price}$ \n"\
+      "<b>!ВНИМАНИЕ!<b> Если Вы в первый раз участвуете в #аукционах в этом канале - "\
+      "нажмите <b>'Зарегистрироваться'<b>.\n После этого, для участия"\
+      "нажимайте: <b>'Участвовать в аукционе'<b>",
+      parse_mode: 'HTML',
       reply_markup:{
         inline_keyboard: [
           [{text: 'Участвовать в аукционе', callback_data: 'participate'}],
@@ -229,9 +253,26 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     bot.send_message chat_id: from['id'], text: 'У вас нет прав для начала аукциона!'
   end
 
+  def final_message(text)
+    admins = bot.get_chat_administrators(chat_id: '@skaybu_test')['result']
+    admins.any? do |admin|
+      if admin['user']['id'] == from['id']
+        bot.send_message chat_id: '@skaybu_test', text: text,
+          parse_mode: 'HTML', reply_markup: {reply_keyboard_remove: [remove_keyboard: true]}
+      end
+    end
+  end
+
   def end_price_check
     if @auction.current_price >= @auction.end_price
       end_auction
+    end
+  end
+
+  def participant_check
+    if @auction.history.last['user_id'] == from['id']
+      bot.send_message chat_id: from['id'], text: 'Ваша ставка последняя. Вы не можете повышать ставку.'
+      throw :abort 
     end
   end
 end

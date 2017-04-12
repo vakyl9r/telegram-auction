@@ -16,9 +16,11 @@
   .form-group
     = f.label :image_1, class:'control-label'
     = f.file_field :image_1, class: 'form-control'
+    = 'Размер файла не более 10 MB'
   .form-group
     = f.label :image_2, class:'control-label'
     = f.file_field :image_2, class: 'form-control'
+    = 'Размер файла не более 10 MB'
   .form-group
     = f.label :start_price, class:'control-label'
     = f.number_field :start_price, class: 'form-control', min: '0'
@@ -31,7 +33,7 @@
   .form-group
     = f.label :auction_time, class:'control-label'
     = f.number_field :auction_time, class: 'form-control', id: 'time', min: '0', placeholder: 'Введите время в минутах'
-    %p#time_p.bg-info.text-center{hidden: true} 
+    %p#time_p.bg-info.text-center{hidden: true}
   .actions
     = f.submit class: 'btn btn-primary'
     = link_to 'Back', root_path, class: 'btn btn-default'
