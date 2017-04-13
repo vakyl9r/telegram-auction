@@ -10,7 +10,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def start
     respond_with :message, text: "Здравствуйте, #{from['first_name']}! Вы были успешно " \
-    "зарегистрированы!\n Добро пожаловать в комнату аукционов Skay BU.",
+    "зарегистрированы!\n Добро пожаловать в комнату аукционов Skay BU."
   end
 
   def auction(auction_id)
