@@ -10,7 +10,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def start
     respond_with :message, text: "Здравствуйте, #{from['first_name']}! Вы были успешно " \
-    "зарегистрированы!\n Добро пожаловать в комнату аукционов Skay BU."
+    "зарегистрированы!\n Добро пожаловать в комнату аукционов Skay BU.",
   end
 
   def auction(auction_id)
@@ -260,7 +260,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     admins.any? do |admin|
       if admin['user']['id'] == from['id']
         bot.send_message chat_id: @@channel, text: text,
-          parse_mode: 'HTML', reply_markup: {reply_keyboard_remove: [remove_keyboard: true]}
+          parse_mode: 'HTML', reply_markup: {remove_keyboard: true}
       end
     end
   end
