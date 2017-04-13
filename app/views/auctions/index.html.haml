@@ -13,6 +13,7 @@
         %th Bet Price
         %th Current price
         %th Active
+        %th Channel
         %th.text-center.thin-column{colspan: 2}= 'Actions'
     %tbody
       - @auctions.each do |auction|
@@ -24,7 +25,8 @@
           %td= auction.start_price
           %td= auction.bet_price
           %td= auction.current_price
-          %th= auction.active ? 'Yes' : 'No'
+          %td= auction.active ? 'Yes' : 'No'
+          %td= auction.channel
           %td.text-center
             = link_to 'Edit', edit_auction_path(auction), class: 'btn btn-default'
           %td.text-center

@@ -1,0 +1,18 @@
+%h1.text-center Channels
+.table-responsive
+  %table.table.table-striped.table-bordered.table-hover
+    %thead
+      %tr.info
+        %th ID
+        %th Name
+        %th Link
+        %th.text-center.thin-column{colspan: 1}= 'Actions'
+    %tbody
+      - @channels.each do |channel|
+        %tr
+          %td= channel.id
+          %td= channel.name
+          %td= channel.link
+          %td.text-center
+            = link_to 'Destroy', channel, method: :delete, class: 'btn btn-danger',
+              data: { confirm: 'Are you sure?' }

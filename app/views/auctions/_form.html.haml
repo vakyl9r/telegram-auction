@@ -34,6 +34,18 @@
     = f.label :auction_time, class:'control-label'
     = f.number_field :auction_time, class: 'form-control', id: 'time', min: '0', placeholder: 'Введите время в минутах'
     %p#time_p.bg-info.text-center{hidden: true}
+  .form-group
+    = f.label :channel, class:'control-label'
+    = f.select :channel, options_from_collection_for_select(@channels, "link", "name"), {}, { class: 'form-control' }
+    %button.btn.btn-info#add-channel.mt-10{type: 'button'} Добавить новый канал
+    .form-group#new-channel{hidden: true}
+      %br
+      %input.form-control#channel-name{placeholder: 'Введите предпочитаемое название канала'}
+      %br
+      %input.form-control#channel-link{placeholder: 'Введите username канала в виде @channelusername'}
+      %br
+      %button.btn.btn-success#create-channel{type: 'button'} Сохранить новый канал
+      %button.btn.btn-danger#cancel{type: 'button'} Отмена
   .actions
     = f.submit class: 'btn btn-primary'
     = link_to 'Back', root_path, class: 'btn btn-default'

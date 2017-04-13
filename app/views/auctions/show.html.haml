@@ -30,6 +30,15 @@
               %strong Current price:
               = @auction.current_price
             %p
+              %strong End price:
+              = @auction.end_price
+            / %p
+            /   %strong Auction time:
+            /   = @auction.auction_time
+            %p
+              %strong Channel:
+              = @auction.channel
+            %p
               %strong Active:
               = @auction.active ? 'Yes' : 'NO'
             / = link_to 'Back', root_path, class: 'btn btn-default'
