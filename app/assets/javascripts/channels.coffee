@@ -16,8 +16,6 @@ $ ->
         }
       }
       dataType: "json"
-      success: (data) ->
+      success: () ->
         $parent.hide()
         $('#auction_channel').append("<option value=#{$link} selected='selected'>#{$name}</option>")
-      error: (data) ->
-        alert('Не удалось добавить канал!')
