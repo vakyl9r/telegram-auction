@@ -32,12 +32,12 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def rules
     link = @@channel.slice(1..-1)
-    respond_with :message, text: "<b>Правила канала</b> <a href='https://t.me/#{link}'>AuctionUA</a> \n" \
+    respond_with :message, text: "<b>Правила канала</b> <a href='https://t.me/#{link}'>#{link}</a> \n" \
     "1. Делая ставку на товар, участник подтверждает желание и возможность его купить. \n" \
     "2. В случае отказа покупать выигранный лот, администратор блокирует участника. \n" \
-    "3. Для возврата права на участия в торгах, необходимо связаться с администратором канала <a href='https://t.me/#{link}'>AuctionUA</a>. \n" \
-    "4. Связь с администратором канала <a href='https://t.me/#{link}'>AuctionUA</a>. \n" \
-    "5. На канале <a href='https://t.me/#{link}'>AuctionUA</a> публикуется исключительно техника с гарантией. \n", parse_mode: 'HTML'
+    "3. Для возврата права на участия в торгах, необходимо связаться с администратором канала <a href='https://t.me/#{link}'>#{link}</a>. \n" \
+    "4. Связь с администратором канала <a href='https://t.me/#{link}'>#{link}</a>. \n" \
+    "5. На канале <a href='https://t.me/#{link}'>#{link}</a> публикуется исключительно техника с гарантией. \n", parse_mode: 'HTML'
   end
 
   def sold
@@ -170,9 +170,13 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def set_auction
-    @auction = Auction.find_by(active: true)
-    if @auction.nil?
-      bot.send_message chat_id: from['id'], text: 'Нет активных аукционов'
+    if from.present?
+      @auction = Auction.find_by(active: true)
+      if @auction.nil?
+        bot.send_message chat_id: from['id'], text: 'Нет активных аукционов'
+        throw :abort
+      end
+    else
       throw :abort
     end
   end
@@ -192,8 +196,12 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def verify_blacklist
-    if BannedUser.find_by(user_id: from['id']).present?
-      bot.send_message chat_id: from['id'], text: 'Вы были забанены!'
+    if from.present?
+      if BannedUser.find_by(user_id: from['id']).present?
+        bot.send_message chat_id: from['id'], text: 'Вы были забанены!'
+        throw :abort
+      end
+    else
       throw :abort
     end
   end
