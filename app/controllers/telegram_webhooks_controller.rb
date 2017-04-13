@@ -273,7 +273,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def participant_check
     if @auction.history.present?
-      if @auction.history.last['user_id'] == from['id']
+      if @auction.history.last['user_id'].to_i == from['id']
         bot.send_message chat_id: from['id'], text: 'Ваша ставка последняя. Вы не можете повышать ставку.'
         throw :abort
       end
