@@ -11,7 +11,7 @@ class ChannelsController < ApplicationController
     respond_to do |format|
       if @channel.save
         format.html { redirect_to @channel, notice: 'Channel was successfully created.' }
-        format.json { render :show, status: :created, location: @channel }
+        format.json { render plain: 'OK', status: 201 }
       else
         format.html { render :new }
         format.json { render json: @channel.errors, status: :unprocessable_entity }

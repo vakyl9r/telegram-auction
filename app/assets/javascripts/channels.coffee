@@ -1,6 +1,8 @@
 $ ->
   $('#add-channel').on 'click', ->
     $(this).parent().find('#new-channel').show()
+  $('#cancel').on 'click', ->
+    $(this).parent().hide()
   $('#create-channel').on 'click', ->
     $parent = $(this).parent()
     $name = $parent.find('#channel-name').val()
