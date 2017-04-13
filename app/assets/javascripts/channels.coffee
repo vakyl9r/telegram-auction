@@ -9,7 +9,7 @@ $ ->
     $link = $parent.find('#channel-link').val()
     $.ajax
       type: 'POST'
-      url: '../channels'
+      url: '/channels'
       data: {
         channel: {
           name: $name, link: $link
