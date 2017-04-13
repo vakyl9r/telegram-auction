@@ -175,7 +175,6 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       bot.send_message chat_id: from['id'], text: 'Нет активных аукционов'
       throw :abort
     end
-    @@channel = @auction.channel
   end
 
   def start_auction(id)
@@ -188,6 +187,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
         @auction, chat['id'], update
       )
       @auction.update!(active: true, current_price: @auction.start_price)
+      @@channel = @auction.channel
     end
   end
 
