@@ -229,7 +229,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       text: "<b>#{@auction.name}</b>\n\n<b>Описание лота</b>: #{@auction.description}\n\n"\
       "<b>Стартовая цена</b>:#{@auction.start_price}$ \n\n"\
       "<b>!ВНИМАНИЕ!</b> Если Вы в первый раз участвуете в #аукционах в этом канале - "\
-      "нажмите <b>'Зарегистрироваться'</b>.\n После этого, для участия"\
+      "нажмите <b>'Зарегистрироваться'</b>.\n После этого, для участия "\
       "нажимайте: <b>'Участвовать в аукционе'</b>",
       parse_mode: 'HTML',
       reply_markup:{
@@ -274,8 +274,8 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   def participant_check
     if @auction.history.present?
       if @auction.history.last['user_id'] == from['id']
-      bot.send_message chat_id: from['id'], text: 'Ваша ставка последняя. Вы не можете повышать ставку.'
-      throw :abort
+        bot.send_message chat_id: from['id'], text: 'Ваша ставка последняя. Вы не можете повышать ставку.'
+        throw :abort
       end
     end
   end
