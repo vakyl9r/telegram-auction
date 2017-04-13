@@ -32,7 +32,8 @@ class StopAuctionJob < ApplicationJob
       reply_markup: {reply_keyboard_markup:
         [
           keyboard:[
-            %w(/sold), %w(/declined)
+            [{text: '/sold'}],
+            [{text: '/declined'}],
           ], one_time_keyboard: true
         ]
       }
