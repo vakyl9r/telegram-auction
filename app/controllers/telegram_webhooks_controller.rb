@@ -259,8 +259,8 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     admins = bot.get_chat_administrators(chat_id: @@channel)['result']
     admins.any? do |admin|
       if admin['user']['id'] == from['id']
-        bot.send_message chat_id: @@channel, text: text,
-          parse_mode: 'HTML', reply_markup: {remove_keyboard: true}
+        bot.send_message chat_id: @@channel, text: text, parse_mode: 'HTML'
+        bot.send_message chat_id: from['id'], text: 'Поздравляем! Вы решили судьбу лота!', reply_markup: {remove_keyboard: true}
       end
     end
   end
