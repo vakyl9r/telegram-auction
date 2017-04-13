@@ -1,5 +1,6 @@
 class AuctionsController < ApplicationController
   before_action :authenticate_user!
+  before_action :set_channel, only: [:new, :edit, :show, :index]
   before_action :set_auction, except: [:index, :new, :create]
 
   def index
@@ -74,10 +75,14 @@ class AuctionsController < ApplicationController
     @auction = Auction.find(params[:id])
   end
 
+  def set_channel
+    @channels = Channel.all
+  end
+
   def auction_params
     params.require(:auction).permit(
       :name, :image_1, :image_2, :start_price, :bet_price, :current_price,
-      :participants, :history, :description, :end_price, :auction_time
+      :participants, :history, :description, :end_price, :auction_time, :channel
     )
   end
 end

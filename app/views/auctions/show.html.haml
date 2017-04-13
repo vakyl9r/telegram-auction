@@ -30,6 +30,9 @@
               %strong Current price:
               = @auction.current_price
             %p
+              %strong Channel:
+              = @auction.channel
+            %p
               %strong Active:
               = @auction.active ? 'Yes' : 'NO'
             / = link_to 'Back', root_path, class: 'btn btn-default'

@@ -31,12 +31,13 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def rules
-    respond_with :message, text: "<b>Правила канала</b> <a href='https://t.me/auctionua'>AuctionUA</a> \n" \
+    link = @@channel.slice(1..-1)
+    respond_with :message, text: "<b>Правила канала</b> <a href='https://t.me/#{link}'>AuctionUA</a> \n" \
     "1. Делая ставку на товар, участник подтверждает желание и возможность его купить. \n" \
     "2. В случае отказа покупать выигранный лот, администратор блокирует участника. \n" \
-    "3. Для возврата права на участия в торгах, необходимо связаться с администратором канала <a href='https://t.me/auctionua'>AuctionUA</a>. \n" \
-    "4. Связь с администратором канала <a href='https://t.me/auctionua'>AuctionUA</a>. \n" \
-    "5. На канале <a href='https://t.me/auctionua'>AuctionUA</a> публикуется исключительно техника с гарантией. \n", parse_mode: 'HTML'
+    "3. Для возврата права на участия в торгах, необходимо связаться с администратором канала <a href='https://t.me/#{link}'>AuctionUA</a>. \n" \
+    "4. Связь с администратором канала <a href='https://t.me/#{link}'>AuctionUA</a>. \n" \
+    "5. На канале <a href='https://t.me/#{link}'>AuctionUA</a> публикуется исключительно техника с гарантией. \n", parse_mode: 'HTML'
   end
 
   def sold
@@ -100,10 +101,10 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def send_lot_photos
     if @auction.image_1.present?
-      bot.send_photo chat_id: '@skaybu_test', photo: File.open(@auction.image_1.path)
+      bot.send_photo chat_id: @@channel, photo: File.open(@auction.image_1.path)
     end
     if @auction.image_2.present?
-      bot.send_photo chat_id: '@skaybu_test', photo: File.open(@auction.image_2.path)
+      bot.send_photo chat_id: @@channel, photo: File.open(@auction.image_2.path)
     end
   end
 
@@ -174,6 +175,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       bot.send_message chat_id: from['id'], text: 'Нет активных аукционов'
       throw :abort
     end
+    @@channel = @auction.channel
   end
 
   def start_auction(id)
@@ -206,7 +208,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def set_admin
-    admins = bot.get_chat_administrators(chat_id: '@skaybu_test')['result']
+    admins = bot.get_chat_administrators(chat_id: @@channel)['result']
     admins.any? do |admin|
       if admin['user']['id'] == from['id']
         @auction.update!(receiver: from['id'])
@@ -223,7 +225,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def start_message
-    bot.send_message chat_id: '@skaybu_test',
+    bot.send_message chat_id: @@channel,
       text: "<b>#{@auction.name}</b>\n<b>Описание лота</b>: #{@auction.description}\n"\
       "<b>Стартовая цена<b>:#{@auction.start_price}$ \n"\
       "<b>!ВНИМАНИЕ!<b> Если Вы в первый раз участвуете в #аукционах в этом канале - "\
@@ -254,10 +256,10 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def final_message(text)
-    admins = bot.get_chat_administrators(chat_id: '@skaybu_test')['result']
+    admins = bot.get_chat_administrators(chat_id: @@channel)['result']
     admins.any? do |admin|
       if admin['user']['id'] == from['id']
-        bot.send_message chat_id: '@skaybu_test', text: text,
+        bot.send_message chat_id: @@channel, text: text,
           parse_mode: 'HTML', reply_markup: {reply_keyboard_remove: [remove_keyboard: true]}
       end
     end
@@ -272,7 +274,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   def participant_check
     if @auction.history.last['user_id'] == from['id']
       bot.send_message chat_id: from['id'], text: 'Ваша ставка последняя. Вы не можете повышать ставку.'
-      throw :abort 
+      throw :abort
     end
   end
 end
