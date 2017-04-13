@@ -226,8 +226,8 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def start_message
     bot.send_message chat_id: @@channel,
-      text: "<b>#{@auction.name}</b>\n<b>Описание лота</b>: #{@auction.description}\n"\
-      "<b>Стартовая цена</b>:#{@auction.start_price}$ \n"\
+      text: "<b>#{@auction.name}</b>\n\n<b>Описание лота</b>: #{@auction.description}\n\n"\
+      "<b>Стартовая цена</b>:#{@auction.start_price}$ \n\n"\
       "<b>!ВНИМАНИЕ!</b> Если Вы в первый раз участвуете в #аукционах в этом канале - "\
       "нажмите <b>'Зарегистрироваться'</b>.\n После этого, для участия"\
       "нажимайте: <b>'Участвовать в аукционе'</b>",
@@ -272,7 +272,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def participant_check
-    if @auction.history!=nil
+    if @auction.history.present?
       if @auction.history.last['user_id'] == from['id']
       bot.send_message chat_id: from['id'], text: 'Ваша ставка последняя. Вы не можете повышать ставку.'
       throw :abort
