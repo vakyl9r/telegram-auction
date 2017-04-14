@@ -238,7 +238,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       text: "<b>#{@auction.name}</b>\n\n<b>Описание лота</b>: #{@auction.description}\n\n"\
       "<b>Стартовая цена</b>:#{@auction.start_price}$ \n\n"\
       "<b>!ВНИМАНИЕ!</b> Если Вы в первый раз участвуете в #аукционах в этом канале - "\
-      "нажмите <b>'Зарегистрироваться'</b>.\n После этого, для участия "\
+      "нажмите <b>'Зарегистрироваться'</b>.\nПосле этого, для участия "\
       "нажимайте: <b>'Участвовать в аукционе'</b>",
       parse_mode: 'HTML',
       reply_markup:{
