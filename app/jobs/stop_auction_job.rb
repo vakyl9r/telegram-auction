@@ -13,7 +13,6 @@ class StopAuctionJob < ApplicationJob
       send_history(auction)
       remove_buttons(chat_id, update)
       destroy_sidekiq_jobs
-      auction.update(history: [], participants: [])
     end
   end
 

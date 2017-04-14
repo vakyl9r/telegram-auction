@@ -31,13 +31,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def rules
-    link = @@channel.slice(1..-1)
-    respond_with :message, text: "<b>Правила канала</b> <a href='https://t.me/#{link}'>#{link}</a> \n" \
-    "1. Делая ставку на товар, участник подтверждает желание и возможность его купить. \n" \
-    "2. В случае отказа покупать выигранный лот, администратор блокирует участника. \n" \
-    "3. Для возврата права на участия в торгах, необходимо связаться с администратором канала <a href='https://t.me/#{link}'>#{link}</a>. \n" \
-    "4. Связь с администратором канала <a href='https://t.me/#{link}'>#{link}</a>. \n" \
-    "5. На канале <a href='https://t.me/#{link}'>#{link}</a> публикуется исключительно техника с гарантией. \n", parse_mode: 'HTML'
+    respond_with :message, text: @@channel.rules, parse_mode: 'HTML'
   end
 
   def sold
@@ -101,10 +95,10 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def send_lot_photos
     if @auction.image_1.present?
-      bot.send_photo chat_id: @@channel, photo: File.open(@auction.image_1.path)
+      bot.send_photo chat_id: @@channel.link, photo: File.open(@auction.image_1.path)
     end
     if @auction.image_2.present?
-      bot.send_photo chat_id: @@channel, photo: File.open(@auction.image_2.path)
+      bot.send_photo chat_id: @@channel.link, photo: File.open(@auction.image_2.path)
     end
   end
 
@@ -191,8 +185,8 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       StopAuctionJob.set(wait: @auction.auction_time.minutes).perform_later(
         @auction, chat['id'], update
       )
-      @auction.update!(active: true, current_price: @auction.start_price)
-      @@channel = @auction.channel
+      @auction.update!(active: true, current_price: @auction.start_price, history: [], participants: [])
+      @@channel = Channel.find_by(link: @auction.channel)
     end
   end
 
@@ -217,7 +211,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def set_admin
-    admins = bot.get_chat_administrators(chat_id: @@channel)['result']
+    admins = bot.get_chat_administrators(chat_id: @@channel.link)['result']
     admins.any? do |admin|
       if admin['user']['id'] == from['id']
         @auction.update!(receiver: from['id'])
@@ -234,7 +228,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def start_message
-    bot.send_message chat_id: @@channel,
+    bot.send_message chat_id: @@channel.link,
       text: "<b>#{@auction.name}</b>\n\n<b>Описание лота</b>: #{@auction.description}\n\n"\
       "<b>Стартовая цена</b>:#{@auction.start_price}$ \n\n"\
       "<b>!ВНИМАНИЕ!</b> Если Вы в первый раз участвуете в #аукционах в этом канале - "\
@@ -265,10 +259,10 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def final_message(text)
-    admins = bot.get_chat_administrators(chat_id: @@channel)['result']
+    admins = bot.get_chat_administrators(chat_id: @@channel.link)['result']
     admins.any? do |admin|
       if admin['user']['id'] == from['id']
-        bot.send_message chat_id: @@channel, text: text, parse_mode: 'HTML'
+        bot.send_message chat_id: @@channel.link, text: text, parse_mode: 'HTML'
         bot.send_message chat_id: from['id'], text: 'Поздравляем! Вы решили судьбу лота!', reply_markup: {remove_keyboard: true}
       end
     end

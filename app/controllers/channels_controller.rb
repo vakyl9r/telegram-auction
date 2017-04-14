@@ -1,8 +1,12 @@
 class ChannelsController < ApplicationController
-  before_action :set_channel, only: :destroy
+  before_action :authenticate_user!
+  before_action :set_channel, only: [:edit, :update, :destroy]
 
   def index
     @channels = Channel.all
+  end
+
+  def edit
   end
 
   def create
@@ -14,6 +18,18 @@ class ChannelsController < ApplicationController
         format.json { head :no_content }
       else
         format.html { render :new }
+        format.json { render json: @channel.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  def update
+    respond_to do |format|
+      if @channel.update(channel_params)
+        format.html { redirect_to channels_path, notice: 'Channel was successfully updated.' }
+        format.json { render :index, status: :ok}
+      else
+        format.html { render :edit }
         format.json { render json: @channel.errors, status: :unprocessable_entity }
       end
     end
@@ -33,6 +49,6 @@ class ChannelsController < ApplicationController
     end
 
     def channel_params
-      params.require(:channel).permit(:name, :link)
+      params.require(:channel).permit(:name, :link, :rules)
     end
 end
