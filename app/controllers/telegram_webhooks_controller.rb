@@ -165,6 +165,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       @auction.participants.map do |participant|
         bot.send_message chat_id: participant['id'], text: text
       end
+      bot.send_message chat_id: @auction.receiver, text: text
       StopAuctionJob.set(wait: 5.minutes).perform_later(@auction, chat['id'], update)
     end
   end

@@ -9,10 +9,11 @@ class StopAuctionJob < ApplicationJob
         text: "#{participant['first_name']}, аукцион по лоту: '#{auction.name}' окончен. "\
         "Мы связываемся с последним претендентом на лот для подтверждения покупки."
       end
+      Telegram.bot.send_message chat_id: auction.receiver, text: "Аукцион по лоту #{auction.name} успешно закрыт"
       send_history(auction)
       remove_buttons(chat_id, update)
-      Telegram.bot.send_message chat_id: auction.receiver, text: "Аукцион по лоту #{auction.name} успешно закрыт"
       destroy_sidekiq_jobs
+      auction.update(history: [], current_price: 0)
     end
   end
 
