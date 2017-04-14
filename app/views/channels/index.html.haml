@@ -6,13 +6,17 @@
         %th ID
         %th Name
         %th Link
-        %th.text-center.thin-column{colspan: 1}= 'Actions'
+        %th Rules
+        %th.text-center.thin-column{colspan: 2}= 'Actions'
     %tbody
       - @channels.each do |channel|
         %tr
           %td= channel.id
           %td= channel.name
           %td= channel.link
+          %td= channel.rules
+          %td.text-center
+            = link_to 'Edit', edit_channel_path(channel), class: 'btn btn-default'
           %td.text-center
             = link_to 'Destroy', channel, method: :delete, class: 'btn btn-danger',
               data: { confirm: 'Are you sure?' }
