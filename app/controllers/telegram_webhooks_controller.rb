@@ -266,7 +266,8 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
         bot.send_message chat_id: @@channel.link, text: text, parse_mode: 'HTML'
         @@participants.map do |participant|
           unless BannedUser.find_by(user_id: participant['id']).present?
-            bot.send_message chat_id: participant['id'], text: text
+            bot.send_message chat_id: participant['id'], text: text,
+              parse_mode: 'HTML'
           end
         end
         bot.send_message chat_id: from['id'], text: 'Поздравляем! Вы решили судьбу лота!', reply_markup: {remove_keyboard: true}
