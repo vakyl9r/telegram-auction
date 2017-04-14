@@ -191,7 +191,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       StopAuctionJob.set(wait: @auction.auction_time.minutes).perform_later(
         @auction, chat['id'], update
       )
-      @auction.update!(active: true, current_price: @auction.start_price)
+      @auction.update!(active: true, current_price: @auction.start_price, history: [], participants: [])
       @@channel = @auction.channel
     end
   end
