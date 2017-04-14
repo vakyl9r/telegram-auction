@@ -134,7 +134,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   def auction_newsletter
     last = @auction.history.last
     @auction.participants.map do |participant|
-      unless BannedUser.find_by(user_id: participant['id']).present?
+      if BannedUser.find_by(user_id: participant['id']).blank?
         if participant['id'] != last['user_id']
           bot.send_message chat_id: participant['id'],
           text: "#{participant['first_name']}, Вы принимаете участие в аукционе по лоту:" \
@@ -265,7 +265,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       if admin['user']['id'] == from['id']
         bot.send_message chat_id: @@channel.link, text: text, parse_mode: 'HTML'
         @@participants.map do |participant|
-          unless BannedUser.find_by(user_id: participant['id']).present?
+          if BannedUser.find_by(user_id: participant['id']).blank?
             bot.send_message chat_id: participant['id'], text: text,
               parse_mode: 'HTML'
           end

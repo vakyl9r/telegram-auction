@@ -21,4 +21,4 @@ $ ->
         $parent.hide()
         $('#auction_channel').append("<option value=#{$link} selected='selected'>#{$name}</option>")
       error: () ->
-        alert('Не удалось создать канал! Заполните все поляю')
+        alert('Не удалось создать канал! Заполните все поля')
