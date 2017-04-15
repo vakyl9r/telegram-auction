@@ -2,7 +2,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   include Telegram::Bot::UpdatesController::MessageContext
   include AbstractController::Rendering
 
-  before_action :set_auction, except: [:auction, :sold, :rules, :declined, :start]
+  before_action :set_auction, except: [:auction, :sold, :rules, :declined, :start, :respond]
   before_action :participant_check, only: :callback_query
   #define_callbacks :auction, terminator: "result == false"
   before_action :verify_blacklist
@@ -57,6 +57,10 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def message(message)
     can_raise?(message) ? raise_price(message) : decline_raise_price if message['reply_to_message']
+  end
+
+  def respond
+    format.json { status: :ok }
   end
 
   private
