@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   telegram_webhooks TelegramWebhooksController, as: :mywebhook
   root to: 'auctions#index'
-  match '/telegram/338002994:AAF-g__IdKVhJoNoi3plNVfuKhQkgHQ7BgA', to: 'telegram_webhooks#callback_query', via: 'POST'
+  match '/telegram/338002994:AAF-g__IdKVhJoNoi3plNVfuKhQkgHQ7BgA', to: 'auctions#index', via: 'POST'
   devise_for :users
   resources :banned_users, only: [:index, :create, :destroy]
   resources :channels, except: [:new, :show]
