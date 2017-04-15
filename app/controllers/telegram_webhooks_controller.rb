@@ -239,7 +239,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       reply_markup:{
         inline_keyboard: [
           [{text: 'Участвовать в аукционе', callback_data: 'participate'}],
-          [{text: 'Зарегистрироваться', url: 'http://t.me/SkayBU_bot'}],
+          [{text: 'Зарегистрироваться', url: 'http://t.me/AuctionUA_bot'}],
         ],
       }
   end
