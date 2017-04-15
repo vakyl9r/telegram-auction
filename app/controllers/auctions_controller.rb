@@ -1,5 +1,5 @@
 class AuctionsController < ApplicationController
-  before_action :authenticate_user!
+  #before_action :authenticate_user!
   before_action :set_channel, only: [:new, :edit, :show, :index]
   before_action :set_auction, except: [:index, :new, :create]
 
