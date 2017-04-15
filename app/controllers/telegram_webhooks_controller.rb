@@ -1,6 +1,7 @@
 class TelegramWebhooksController < Telegram::Bot::UpdatesController
   include Telegram::Bot::UpdatesController::MessageContext
   include AbstractController::Rendering
+  include ActionController::MimeResponds
 
   before_action :set_auction, except: [:auction, :sold, :rules, :declined, :start, :respond]
   before_action :participant_check, only: :callback_query
