@@ -60,7 +60,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def respond
-    respond_to.json { status: :ok }
+    respond_to.json { status: 200 }
   end
 
   private
