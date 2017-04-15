@@ -263,7 +263,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     admins.any? do |admin|
       if admin['user']['id'] == from['id']
         bot.send_message chat_id: @@channel.link, text: text, parse_mode: 'HTML'
-        if @@participants.exist?
+        if @@participants.present?
           @@participants.map do |participant|
             if BannedUser.find_by(user_id: participant['id']).blank?
               bot.send_message chat_id: participant['id'], text: text,
