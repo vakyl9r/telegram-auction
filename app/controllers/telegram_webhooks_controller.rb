@@ -258,6 +258,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def final_message(text)
+    binding.pry
     admins = bot.get_chat_administrators(chat_id: @@channel.link)['result']
     admins.any? do |admin|
       if admin['user']['id'] == from['id']
