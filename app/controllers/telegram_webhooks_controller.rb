@@ -186,6 +186,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       )
       @auction.update!(active: true, current_price: @auction.start_price, history: [], participants: [])
       @@channel = Channel.find_by(link: @auction.channel)
+      @@participants = @auction.participants
     end
   end
 
@@ -258,12 +259,10 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def final_message(text)
-    @@channel = Channel.find_by(link: '@MeFartBotStories')
     admins = bot.get_chat_administrators(chat_id: @@channel.link)['result']
     admins.any? do |admin|
       if admin['user']['id'] == from['id']
         bot.send_message chat_id: @@channel.link, text: text, parse_mode: 'HTML'
-        @@participants = []
         if @@participants.present?
           @@participants.map do |participant|
             if BannedUser.find_by(user_id: participant['id']).blank?
