@@ -101,7 +101,8 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def can_raise?(message)
-    message['text'].to_f > @auction.current_price
+    message['text'].to_f > @auction.current_price &&
+      message['text'].to_f >= @auction.current_price + @auction.bet_price
   end
 
   def raise_price(message)
