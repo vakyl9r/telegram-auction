@@ -121,7 +121,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def decline_raise_price
     respond_with :message,
-      text: "Ваша ставка меньше текущей цены #{@auction.current_price}",
+      text: "Ваша ставка некорректная. Ставка должна быть больше #{@auction.current_price + @auction.bet_price}",
       reply_markup: keyboard
   end
 
