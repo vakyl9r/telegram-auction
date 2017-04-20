@@ -106,7 +106,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def raise_price(message)
-    @auction.set_price(message['text'].to_f)
+    @auction.set_price(message['text'].to_f.round(2))
     @auction.save_in_history({
       user_id: from['id'],
       full_name: "#{from['first_name']} #{from['last_name']}",
