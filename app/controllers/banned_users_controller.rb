@@ -7,7 +7,8 @@ class BannedUsersController < ApplicationController
 
   def create
     @banned_user = BannedUser.create(banned_user_params)
-    Telegram.bot.send_message chat_id: '@skaybu_test', text: "#{@banned_user.first_name} #{@banned_user.last_name} "\
+    Telegram.bot.send_message chat_id: banned_user_params[:chat_id],
+    text: "#{@banned_user.first_name} #{@banned_user.last_name} " \
     'заблокирован по причине нарушения правил аукциона. Читать правила /rules.'
   end
 
@@ -18,7 +19,7 @@ class BannedUsersController < ApplicationController
   private
 
   def banned_user_params
-    params.require(:banned_user).permit(:user_id, :first_name, :last_name)
+    params.require(:banned_user).permit(:user_id, :first_name, :last_name, :chat_id)
   end
 
   def set_banned_user

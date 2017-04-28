@@ -6,12 +6,13 @@ $ ->
     user_id = $grandparent.find('.id').text()
     first_name = $grandparent.find('.first_name').text()
     last_name = $grandparent.find('.last_name').text()
+    chat_id = $('.chanel_id').text()
     $.ajax
       type: 'POST'
       url: "../banned_users"
       data: {
         banned_user: {
-          user_id: user_id, first_name: first_name, last_name: last_name 
+          user_id: user_id, first_name: first_name, last_name: last_name, chat_id: chat_id
         }
       }
       dataType: "json"
