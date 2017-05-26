@@ -2,6 +2,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   include Telegram::Bot::UpdatesController::MessageContext
   include AbstractController::Rendering
 
+  before_action :check_forbidden, only: :callback_query
   before_action :set_auction, except: [:auction, :sold, :rules, :declined, :start]
   before_action :participant_check, only: :callback_query
   before_action :verify_blacklist
@@ -198,6 +199,12 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
         throw :abort
       end
     else
+      throw :abort
+    end
+  end
+
+  def check_forbidden
+    rescue Telegram::Bot::Forbidden
       throw :abort
     end
   end
