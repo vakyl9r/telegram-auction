@@ -51,8 +51,8 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     when 'end_auction'
       end_auction
     end
-  rescue Telegram::Bot::Forbidden
-    throw :abort
+  rescue Telegram::Bot::Forbidden => e
+    logger.info e.message
   end
 
   def message(message)

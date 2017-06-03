@@ -39,7 +39,7 @@ gem 'carrierwave'
 gem 'file_validators'
 
 # gem 'telegram-bot-ruby'
-gem 'telegram-bot'
+gem 'telegram-bot', github: 'telegram-bot-rb/telegram-bot', ref: '1098118'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
@@ -58,6 +58,9 @@ group :development, :test do
   gem 'byebug', platform: :mri
   gem 'pry-rails'
   gem 'pry-nav'
+  gem 'rspec-rails', '~> 3.5'
+  gem 'rspec-its'
+  gem 'spring-commands-rspec'
 end
 
 group :development do
