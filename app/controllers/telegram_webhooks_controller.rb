@@ -51,8 +51,9 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     when 'end_auction'
       end_auction
     end
-  rescue Telegram::Bot::Forbidden => e
+  rescue => e
     logger.info "ERROR OCCURED - #{e.message}"
+    return nil
   end
 
   def message(message)
@@ -72,7 +73,8 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def bet
-    respond_with :message, text: "#{from['first_name']}, Вы подняли цену до #{@auction.current_price}$"
+    respond_with :message,
+      text: "#{from['first_name']}, Вы подняли цену до #{@auction.current_price + @auction.bet_price}$"
     @auction.bet
     @auction.save_in_history(
       {
@@ -145,6 +147,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
           end
         end
       rescue
+        @auction.remove_participant(participant)
         next
       end
     end
