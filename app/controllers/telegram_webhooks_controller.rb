@@ -281,7 +281,6 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     end
   rescue NameError => e
     logger.info "ERROR OCCURED #{e.message}"
-    throw :abort
   end
 
   def end_price_check
