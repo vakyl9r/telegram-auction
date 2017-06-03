@@ -51,8 +51,8 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     when 'end_auction'
       end_auction
     end
-  rescue Telegram::Bot::Forbidden => e
-    logger.info e.message
+  rescue => e
+    logger.info "ERROR OCCURED - #{e.message}"
   end
 
   def message(message)
@@ -279,6 +279,9 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
         end
       end
     end
+  rescue NameError => e
+    logger.info "ERROR OCCURED #{e.message}"
+    throw :abort
   end
 
   def end_price_check
