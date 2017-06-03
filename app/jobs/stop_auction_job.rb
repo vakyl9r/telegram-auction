@@ -5,9 +5,14 @@ class StopAuctionJob < ApplicationJob
     if auction.active
       auction.update!(active: false)
       auction.participants.map do |participant|
-        Telegram.bot.send_message chat_id: participant['id'],
-        text: "#{participant['first_name']}, аукцион по лоту: '#{auction.name}' окончен. "\
-        "Мы связываемся с последним претендентом на лот для подтверждения покупки." rescue nil
+        begin
+          Telegram.bot.send_message chat_id: participant['id'],
+          text: "#{participant['first_name']}, аукцион по лоту: '#{auction.name}' окончен. "\
+          "Мы связываемся с последним претендентом на лот для подтверждения покупки."
+        rescue
+          auction.remove_participant(participant)
+          next
+        end
       end
       Telegram.bot.send_message chat_id: auction.receiver, text: "Аукцион по лоту #{auction.name} успешно закрыт"
       send_history(auction)

@@ -51,7 +51,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     when 'end_auction'
       end_auction
     end
-  rescue => e
+  rescue Telegram::Bot::Forbidden => e
     logger.info "ERROR OCCURED - #{e.message}"
   end
 
@@ -72,6 +72,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def bet
+    respond_with :message, text: "#{from['first_name']}, Вы подняли цену до #{@auction.current_price}$"
     @auction.bet
     @auction.save_in_history(
       {
@@ -82,7 +83,6 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
         time: Time.current.strftime('%F %H:%M')
       }
     )
-    respond_with :message, text: "#{from['first_name']}, Вы подняли цену до #{@auction.current_price}$"
     remove_buttons
     auction_newsletter
     end_price_check
@@ -135,13 +135,17 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   def auction_newsletter
     last = @auction.history.last
     @auction.participants.map do |participant|
-      if BannedUser.find_by(user_id: participant['id']).blank?
-        if participant['id'] != last['user_id']
-          bot.send_message chat_id: participant['id'],
-          text: "#{participant['first_name']}, Вы принимаете участие в аукционе по лоту:" \
-          "'#{@auction.name}'.\n#{last['full_name'].slice(0,3)}*** " \
-          "поднял цену до #{@auction.current_price}$.", reply_markup: keyboard
+      begin
+        if BannedUser.find_by(user_id: participant['id']).blank?
+          if participant['id'] != last['user_id']
+            bot.send_message chat_id: participant['id'],
+            text: "#{participant['first_name']}, Вы принимаете участие в аукционе по лоту:" \
+            "'#{@auction.name}'.\n#{last['full_name'].slice(0,3)}*** " \
+            "поднял цену до #{@auction.current_price}$.", reply_markup: keyboard
+          end
         end
+      rescue
+        next
       end
     end
     if @auction.receiver

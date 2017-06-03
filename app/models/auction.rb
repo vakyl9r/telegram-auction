@@ -11,6 +11,10 @@ class Auction < ApplicationRecord
     end
   end
 
+  def remove_participant(participant)
+    update(participants: participants - [participant])
+  end
+
   def save_in_history(event)
     update(history: history << event)
   end
