@@ -191,7 +191,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       bot.send_message chat_id: from['id'], text: 'Уже есть активный аукцион!'
       return false
     else
-      StopAuctionJob.set(wait: @auction.auction_time.minutes).perform_later(
+      StopAuctionJob.set(wait: @auction.auction_time.minutes - 5.minutes).perform_later(
         @auction, chat['id'], update
       )
       @auction.update!(active: true, current_price: @auction.start_price, history: [], participants: [])
@@ -274,6 +274,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       admins.any? do |admin|
         if admin['user']['id'] == from['id']
           bot.send_message chat_id: @@channel.link, text: text, parse_mode: 'HTML'
+          @@channel = nil
           if @@participants.present?
             @@participants.map do |participant|
               if BannedUser.find_by(user_id: participant['id']).blank?
