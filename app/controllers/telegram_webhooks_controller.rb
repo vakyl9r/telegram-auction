@@ -159,7 +159,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def end_auction
-    if Sidekiq::ScheduledSet.new.size < 2
+    if Sidekiq::ScheduledSet.new.size < 3
       if @auction.current_price >= @auction.end_price
         text = "Достигнут верхний предел цены по лоту '#{@auction.name}', до окончания аукциона осталось 5 минут."
       else
@@ -191,9 +191,10 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       bot.send_message chat_id: from['id'], text: 'Уже есть активный аукцион!'
       return false
     else
-      StopAuctionJob.set(wait: @auction.auction_time.minutes - 5.minutes).perform_later(
+      StopAuctionJob.set(wait: @auction.auction_time.minutes).perform_later(
         @auction, chat['id'], update
       )
+      ClosureWarningJob.set(wait: @auction.auction_time.minutes - 5.minutes).perform_later(@auction)
       @auction.update!(active: true, current_price: @auction.start_price, history: [], participants: [])
       @@channel = Channel.find_by(link: @auction.channel)
       @@participants = @auction.participants
