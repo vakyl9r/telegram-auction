@@ -77,13 +77,27 @@
         #history.panel-collapse.collapse
           .panel-body
             %ul
-              -if @auction.history
+              -if @auction.history.any?
                 - @auction.history.each do |event|
                   %li
                     %span= "[#{event['time']}] "
                     %strong= "#{event['full_name']} "
                     поднял ставку на
                     %strong= "#{event['bet']}"
+      .panel.panel-default
+        .panel-heading
+          %h4.panel-title
+            %a{"data-parent" => "#accordion", "data-toggle" => "collapse", :href => "#logs"}
+              Telegram Logs
+        #logs.panel-collapse.collapse
+          .panel-body
+            %ul
+              -if @auction.telegram_logs.any?
+                - @auction.telegram_logs.each do |log|
+                  %li
+                    %span= "[#{log.created_at.strftime('%T')}] "
+                    %strong= "#{log.user} "
+                    %span= log.data
     .pull-right
       = link_to 'Back', root_path, class: 'btn btn-default'
       = link_to 'Edit', edit_auction_path(@auction), class: 'btn btn-primary'

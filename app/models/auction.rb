@@ -1,7 +1,10 @@
 class Auction < ApplicationRecord
+  has_many :telegram_logs
+
   validates :name, :start_price, :bet_price, :current_price,
     :description, :end_price, :auction_time, :channel, presence: true
   validates :image_1, :image_2, file_size: { less_than: 10.megabytes }
+
   mount_uploader :image_1, ImageUploader
   mount_uploader :image_2, ImageUploader
 

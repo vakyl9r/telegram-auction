@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170414102910) do
+ActiveRecord::Schema.define(version: 20170625144120) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -49,6 +49,16 @@ ActiveRecord::Schema.define(version: 20170414102910) do
     t.text     "rules"
   end
 
+  create_table "telegram_logs", force: :cascade do |t|
+    t.string   "user"
+    t.json     "data"
+    t.string   "action"
+    t.integer  "auction_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["auction_id"], name: "index_telegram_logs_on_auction_id", using: :btree
+  end
+
   create_table "users", force: :cascade do |t|
     t.string   "email",                  default: "", null: false
     t.string   "encrypted_password",     default: "", null: false
@@ -67,4 +77,5 @@ ActiveRecord::Schema.define(version: 20170414102910) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   end
 
+  add_foreign_key "telegram_logs", "auctions"
 end

@@ -7,6 +7,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   before_action :verify_blacklist
 
   def start
+    create_log('participant start')
     respond_with :message, text: "Здравствуйте, #{from['first_name']}! Вы были успешно " \
     "зарегистрированы!\n Добро пожаловать в комнату аукционов Skay BU."
   end
@@ -15,6 +16,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     if start_auction(auction_id)
       if set_admin
         if @auction.receiver == from['id']
+          create_log('admin start')
           send_lot_photos
           start_message
           bot.send_message(
@@ -22,6 +24,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
             reply_markup: admin_keyboard
           )
         else
+          create_log('not authorized')
           not_authorized_message
         end
       end
@@ -29,14 +32,17 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def rules
+    create_log('rules')
     respond_with :message, text: @@channel.rules, parse_mode: 'HTML'
   end
 
   def sold
+    create_log('sold')
     final_message('<b>Лот продан. Следите за анонсами новых торгов в канале.</b>')
   end
 
   def declined
+    create_log('declined')
     final_message('<b>Лот не продан. Будут новые торги по данному лоту, следите за анонсами в канале.</b>')
   end
 
@@ -52,6 +58,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       end_auction
     end
   rescue => e
+    create_log('Error')
     logger.info "ERROR OCCURED - #{e.message}"
     return nil
   end
@@ -63,6 +70,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   private
 
   def participate
+    create_log('participate')
     @auction.add_participant(
       { id: from['id'].to_s, first_name: from['first_name'], last_name: from['last_name'] }
     )
@@ -73,6 +81,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def bet
+    create_log('bet')
     respond_with :message,
       text: "#{from['first_name']}, Вы подняли цену до #{@auction.current_price + @auction.bet_price}$"
     @auction.bet
@@ -110,6 +119,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def raise_price(message)
+    create_log('raise price')
     @auction.set_price(message['text'].to_f.round(2))
     @auction.save_in_history({
       user_id: from['id'],
@@ -124,6 +134,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   end
 
   def decline_raise_price
+    create_log('decline raise price')
     respond_with :message,
       text: "Ваша ставка некорректная. Ставка должна быть больше #{@auction.current_price + @auction.bet_price}",
       reply_markup: keyboard
@@ -160,6 +171,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def end_auction
     if Sidekiq::ScheduledSet.new.size < 3
+      create_log('end auction')
       if @auction.current_price >= @auction.end_price
         text = "Достигнут верхний предел цены по лоту '#{@auction.name}', до окончания аукциона осталось 5 минут."
       else
@@ -289,6 +301,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       end
     end
   rescue NameError => e
+    create_log('Error')
     logger.info "ERROR OCCURED #{e.message}"
   end
 
@@ -305,5 +318,17 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
         throw :abort
       end
     end
+  end
+
+  def active_auction
+    @_auction ||= Auction.find_by(active: true)
+  end
+
+  def create_log(action)
+    active_auction.telegram_logs.create(
+      user: "#{from['first_name']} #{from['last_name']}",
+      data: from,
+      action: action
+    )
   end
 end
