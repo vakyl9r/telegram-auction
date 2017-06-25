@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   resources :auctions do
     get :start, on: :member
     get :stop, on: :member
+    delete :destroy_logs, on: :member
   end
 
   require 'sidekiq/web'

@@ -1,5 +1,5 @@
 class Auction < ApplicationRecord
-  has_many :telegram_logs
+  has_many :telegram_logs, dependent: :destroy
 
   validates :name, :start_price, :bet_price, :current_price,
     :description, :end_price, :auction_time, :channel, presence: true

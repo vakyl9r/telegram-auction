@@ -69,6 +69,14 @@ class AuctionsController < ApplicationController
     end
   end
 
+  def destroy_logs
+    @auction.telegram_logs.delete_all
+    respond_to do |format|
+      format.html { redirect_to @auction, notice: 'The Logs are deleted!' }
+      format.json { head :no_content }
+    end
+  end
+
   private
 
   def set_auction

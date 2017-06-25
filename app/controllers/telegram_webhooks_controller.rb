@@ -327,7 +327,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
   def create_log(action)
     active_auction.telegram_logs.create(
       user: "#{from['first_name']} #{from['last_name']}",
-      data: from,
+      data: payload,
       action: action
     )
   end

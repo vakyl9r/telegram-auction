@@ -91,11 +91,12 @@
               Telegram Logs
         #logs.panel-collapse.collapse
           .panel-body
+            = link_to 'Delete Logs', destroy_logs_auction_path(@auction), class: 'btn btn-danger', method: :delete
             %ul
               -if @auction.telegram_logs.any?
                 - @auction.telegram_logs.each do |log|
                   %li
-                    %span= "[#{log.created_at.strftime('%T')}] "
+                    %span= "[#{log.created_at.strftime('%T')}] [#{log.action}]"
                     %strong= "#{log.user} "
                     %span= log.data
     .pull-right
