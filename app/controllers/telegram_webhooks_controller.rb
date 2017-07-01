@@ -320,12 +320,12 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     end
   end
 
-  def active_auction
-    @_auction ||= Auction.find_by(active: true)
+  def active_or_last_active_auction
+    @_auction ||= Auction.find_by(active: true) || Auction.order('updated_at desc').first
   end
 
   def create_log(action)
-    active_auction.telegram_logs.create(
+    active_or_last_active_auction.telegram_logs.create(
       user: "#{from['first_name']} #{from['last_name']}",
       data: payload,
       action: action
